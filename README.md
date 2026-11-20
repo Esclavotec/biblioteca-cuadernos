@@ -193,6 +193,11 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 
 ## Historial de cambios
 
+- **v1.3.2 (2026-11-20). Sin parpadeo al pasar la hoja en el celular.**
+  - Los post-its en reposo ya no usan transformaciones 3D (las sacaban a otra capa y se veían por encima de la hoja que gira). Solo se vuelven 3D mientras están levantados, y se bajan solos al empezar a pasar la hoja.
+  - El ajuste de fórmulas corre cuando la hoja ya quedó quieta; antes corría a mitad de la animación y movía el contenido.
+  - Los dibujos se cargan junto con la hoja, sin carga diferida, para que no aparezcan de golpe al voltearla.
+
 - **v1.3.1 (2026-11-20).** Los archivos propios llevan `?v=1.3.1` para que el navegador no mezcle código viejo con cuadernos nuevos (se veían `:::azul` y `$…$` sin formato).
 
 - **v1.3 (2026-11-20). Primer cuaderno real: Cálculo y Análisis III (Prof. Rosales).**

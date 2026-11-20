@@ -330,7 +330,8 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 
 /* Dibujos como post-its: sujetos arriba, se levantan para ver lo de debajo */
 .postits { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(var(--lh) * .6) 5%; margin-top: calc(var(--lh) * .6); }
-.postit-slot { position: relative; margin: 0; width: 41%; perspective: 900px; }
+/* En reposo todo es 2D: una transformación 3D sacaría el post-it a otra capa y se vería encima de la hoja al pasarla */
+.postit-slot { position: relative; margin: 0; width: 41%; }
 .postits.solo .postit-slot { width: 56%; }
 .postit-debajo {
   position: absolute; inset: 0; padding: 26% 8% 6%; overflow: auto; scrollbar-width: none;
@@ -342,10 +343,9 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 .postit {
   position: relative; z-index: 1; display: block; width: 100%; padding: 6% 5% 4%; border: 0; cursor: pointer; color: #3b3a30;
   background: var(--pi); border-radius: 1px 1px 3px 3px;
-  transform-origin: 50% 0; transform: rotate(var(--giro)) rotateX(0deg);
+  transform-origin: 50% 0; transform: rotate(var(--giro));
   transition: transform .55s var(--ease-out), box-shadow .55s var(--ease-out);
   box-shadow: 0 1px 1px rgba(30, 40, 35, .14), 0 9px 12px -9px rgba(30, 40, 35, .45);
-  backface-visibility: hidden;
 }
 .postit::before { /* franja adhesiva, un poco más oscura */
   content: ''; position: absolute; left: 0; right: 0; top: 0; height: 9%; background: rgba(0, 0, 0, .045);
@@ -361,9 +361,9 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 .postit img { display: block; width: 100%; height: auto; pointer-events: none; }
 .postit-pie { display: block; margin-top: .2em; font-size: .74em; line-height: 1.25; text-align: center; }
 @media (hover: hover) {
-  .postit-slot:not(.lifted) .postit:hover { transform: rotate(var(--giro)) rotateX(-14deg); box-shadow: 0 1px 1px rgba(30, 40, 35, .14), 0 16px 16px -10px rgba(30, 40, 35, .45); }
+  .postit-slot:not(.lifted) .postit:hover { transform: perspective(900px) rotate(var(--giro)) rotateX(-14deg); box-shadow: 0 1px 1px rgba(30, 40, 35, .14), 0 16px 16px -10px rgba(30, 40, 35, .45); }
 }
-.postit-slot.lifted .postit { transform: rotate(var(--giro)) rotateX(-80deg); box-shadow: 0 1px 1px rgba(30, 40, 35, .1), 0 30px 26px -16px rgba(30, 40, 35, .5); }
+.postit-slot.lifted .postit { transform: perspective(900px) rotate(var(--giro)) rotateX(-80deg); box-shadow: 0 1px 1px rgba(30, 40, 35, .1), 0 30px 26px -16px rgba(30, 40, 35, .5); }
 .postit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .postit-zoom {
   position: absolute; z-index: 2; top: -.55em; right: -.55em; width: 1.9em; height: 1.9em; display: grid; place-items: center;

@@ -13,8 +13,8 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js?v=1.3.1';
-import { escapeHtml as esc, contrastText, safeSrc } from './util.js?v=1.3.1';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.3.2';
+import { escapeHtml as esc, contrastText, safeSrc } from './util.js?v=1.3.2';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -91,7 +91,7 @@ function postits(dibujos) {
     return `<figure class="postit-slot" style="--giro:${giro}deg">` +
       `<div class="postit-debajo"><p>${d.debajo ? renderInline(d.debajo) : '<span class="vacio">(nada escrito debajo)</span>'}</p></div>` +
       `<button type="button" class="postit ${color}" data-act="lift" aria-pressed="false" aria-label="Levantar el post-it para ver lo que hay debajo">` +
-      `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` +
+      `<img src="${esc(src)}" alt="${esc(alt)}" decoding="sync">` +
       (pie ? `<span class="postit-pie">${pie}</span>` : '') + `</button>` +
       `<button type="button" class="postit-zoom" data-act="zoom" data-src="${esc(src)}" data-alt="${esc(alt)}" aria-label="Ampliar dibujo"><i class="ph ph-magnifying-glass-plus" aria-hidden="true"></i></button>` +
       `</figure>`;
@@ -219,9 +219,13 @@ export class BookViewer {
       startPage: this.toIndex(this.page),
     });
     this.flip.loadFromHTML(this.pages);
+    requestAnimationFrame(() => this.fitMath());
     this.flip.on('flip', (e) => this.sync(e.data));
     this.flip.on('changeOrientation', () => this.sync(this.flip.getCurrentPageIndex()));
     this.flip.on('init', () => this.sync(this.flip.getCurrentPageIndex()));
+    // Al empezar a pasar la hoja se bajan los post-its levantados (en 3D se verían encima de la hoja que gira).
+    // Las fórmulas se ajustan cuando la hoja ya quedó quieta, nunca a mitad de la animación.
+    this.flip.on('changeState', (e) => (e.data === 'read' ? this.fitMath() : this.dropPostits()));
     this.sync(this.toIndex(this.page));
   }
 
@@ -245,11 +249,18 @@ export class BookViewer {
     }
     this.indicator.textContent = text;
     this.page = portrait || index <= 0 || index >= this.last ? this.toPage(index) : this.toPage(index % 2 ? index : index - 1);
-    requestAnimationFrame(() => this.fitMath());
-    clearTimeout(this.fitLate); this.fitLate = setTimeout(() => this.fitMath(), 600); // tras la animación
+    if (!this.flip || reducedMotion()) requestAnimationFrame(() => this.fitMath()); // sin animación no hay 'read'
     this.el.querySelector('[data-act="prev"]').disabled = index <= 0;
     this.el.querySelector('[data-act="next"]').disabled = index >= this.last;
     this.opts.onPageChange?.(this.page);
+  }
+
+  /** Baja todos los post-its levantados. */
+  dropPostits() {
+    for (const slot of this.el.querySelectorAll('.postit-slot.lifted')) {
+      slot.classList.remove('lifted');
+      slot.querySelector('.postit')?.setAttribute('aria-pressed', 'false');
+    }
   }
 
   /**
@@ -366,7 +377,7 @@ export class BookViewer {
     this.destroyed = true;
     document.removeEventListener('keydown', this.onKey);
     window.removeEventListener('resize', this.onResize);
-    clearTimeout(this.fitTimer); clearTimeout(this.fitLate);
+    clearTimeout(this.fitTimer);
     try { this.flip?.destroy(); } catch { /* ya desmontado */ }
     this.el.remove();
   }

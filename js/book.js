@@ -69,8 +69,33 @@ export function pageInnerHtml(p) {
     default:
       html = '';
   }
-  if (p.nota) html += `<aside class="nota">${renderInline(p.nota)}</aside>`;
+  if (Array.isArray(p.dibujos) && p.dibujos.length) html += postits(p.dibujos);
+  const notas = Array.isArray(p.nota) ? p.nota : p.nota ? [p.nota] : [];
+  notas.forEach((n) => { html += `<aside class="nota">${renderInline(n)}</aside>`; });
   return html;
+}
+
+/**
+ * Dibujos pegados como post-its. Están sujetos por el borde de arriba: al tocarlos
+ * se levantan (sin despegarse) y dejan ver lo que hay escrito debajo, en "debajo".
+ */
+const POSTIT_COLORES = ['amarillo', 'rosa', 'celeste', 'verde'];
+function postits(dibujos) {
+  return `<div class="postits${dibujos.length === 1 ? ' solo' : ''}">` + dibujos.map((d, i) => {
+    const src = safeSrc(d?.src);
+    if (!src) return '';
+    const color = POSTIT_COLORES.includes(d.color) ? d.color : POSTIT_COLORES[i % POSTIT_COLORES.length];
+    const pie = d.pie ? renderInline(d.pie) : '';
+    const alt = d.alt || String(d.pie || 'Dibujo del apunte').replace(/[$\\{}]/g, '');
+    const giro = ((i * 37) % 7 - 3) * 0.5; // -1.5° … 1.5°, estable
+    return `<figure class="postit-slot" style="--giro:${giro}deg">` +
+      `<div class="postit-debajo"><p>${d.debajo ? renderInline(d.debajo) : '<span class="vacio">(nada escrito debajo)</span>'}</p></div>` +
+      `<button type="button" class="postit ${color}" data-act="lift" aria-pressed="false" aria-label="Levantar el post-it para ver lo que hay debajo">` +
+      `<img src="${esc(src)}" alt="${esc(alt)}" loading="lazy">` +
+      (pie ? `<span class="postit-pie">${pie}</span>` : '') + `</button>` +
+      `<button type="button" class="postit-zoom" data-act="zoom" data-src="${esc(src)}" data-alt="${esc(alt)}" aria-label="Ampliar dibujo"><i class="ph ph-magnifying-glass-plus" aria-hidden="true"></i></button>` +
+      `</figure>`;
+  }).join('') + `</div>`;
 }
 
 export class BookViewer {
@@ -86,7 +111,7 @@ export class BookViewer {
 
     const color = /^#[0-9a-f]{6}$/i.test(book.color) ? book.color : '#3b3f3d';
     this.el = document.createElement('div');
-    this.el.className = 'viewer';
+    this.el.className = book.tintas ? 'viewer tintas' : 'viewer';
     this.el.style.setProperty('--c', color);
     this.el.style.setProperty('--ct', contrastText(color));
     this.el.innerHTML = `
@@ -110,9 +135,12 @@ export class BookViewer {
     this.onKey = (e) => this.handleKey(e);
     this.el.addEventListener('click', this.onClick);
     document.addEventListener('keydown', this.onKey);
+    this.onResize = () => { clearTimeout(this.fitTimer); this.fitTimer = setTimeout(() => this.fitMath(), 150); };
+    window.addEventListener('resize', this.onResize);
     root.appendChild(this.el);
 
     this.pages = this.buildPages();
+    document.fonts?.ready.then(() => this.fitMath());     // las fuentes de KaTeX cambian el ancho
     if (window.St?.PageFlip) this.mountFlip();
     else this.mountFallback();
   }
@@ -217,9 +245,26 @@ export class BookViewer {
     }
     this.indicator.textContent = text;
     this.page = portrait || index <= 0 || index >= this.last ? this.toPage(index) : this.toPage(index % 2 ? index : index - 1);
+    requestAnimationFrame(() => this.fitMath());
+    clearTimeout(this.fitLate); this.fitLate = setTimeout(() => this.fitMath(), 600); // tras la animación
     this.el.querySelector('[data-act="prev"]').disabled = index <= 0;
     this.el.querySelector('[data-act="next"]').disabled = index >= this.last;
     this.opts.onPageChange?.(this.page);
+  }
+
+  /** Achica las fórmulas centradas que no caben a lo ancho de la hoja (hasta un 60 %). */
+  fitMath() {
+    if (this.destroyed) return;
+    for (const m of this.el.querySelectorAll('.math-display')) {
+      if (!m.clientWidth) continue;                       // hoja oculta: se ajusta cuando se vea
+      m.style.fontSize = '';
+      // Ancho real de la fórmula: KaTeX deja que su contenido se salga de la caja sin cambiar scrollWidth
+      const partes = [...m.querySelectorAll('.katex-html > .base, .math-raw')].map((e) => e.getBoundingClientRect());
+      if (!partes.length) continue;
+      const ancho = Math.max(...partes.map((r) => r.right)) - Math.min(...partes.map((r) => r.left));
+      const ratio = m.clientWidth / ancho;
+      if (ratio < 1) m.style.fontSize = `${Math.max(0.6, ratio * 0.97).toFixed(3)}em`;
+    }
   }
 
   /* ---------- Modo de reserva (si no cargó la librería) ---------- */
@@ -262,7 +307,13 @@ export class BookViewer {
     if (act === 'close') return this.close();
     if (act === 'prev') return this.prev();
     if (act === 'next') return this.next();
-    if (act === 'zoom') return this.zoom(actEl.dataset.src, actEl.querySelector('img')?.alt || '');
+    if (act === 'zoom') return this.zoom(actEl.dataset.src, actEl.dataset.alt || actEl.querySelector('img')?.alt || '', actEl.classList.contains('postit-zoom'));
+    if (act === 'lift') {
+      const up = actEl.getAttribute('aria-pressed') !== 'true';
+      actEl.setAttribute('aria-pressed', String(up));
+      actEl.closest('.postit-slot')?.classList.toggle('lifted', up);
+      return;
+    }
     return this.opts.onAction?.(act, e);
   }
 
@@ -279,9 +330,9 @@ export class BookViewer {
   }
 
   /** Muestra una imagen a pantalla completa. */
-  zoom(src, alt) {
+  zoom(src, alt, dibujo = false) {
     const box = document.createElement('div');
-    box.className = 'lightbox';
+    box.className = dibujo ? 'lightbox dibujo' : 'lightbox';
     box.innerHTML = `<img src="${esc(src)}" alt="${esc(alt)}"><button type="button" class="btn"><i class="ph ph-x" aria-hidden="true"></i>Cerrar</button>`;
     box.addEventListener('click', () => box.remove());
     this.el.appendChild(box);
@@ -297,6 +348,8 @@ export class BookViewer {
     if (this.destroyed) return;
     this.destroyed = true;
     document.removeEventListener('keydown', this.onKey);
+    window.removeEventListener('resize', this.onResize);
+    clearTimeout(this.fitTimer); clearTimeout(this.fitLate);
     try { this.flip?.destroy(); } catch { /* ya desmontado */ }
     this.el.remove();
   }

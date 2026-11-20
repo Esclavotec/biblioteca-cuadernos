@@ -14,7 +14,7 @@
     {
       "tipo": "texto",
       "titulo": "Cómo leer",
-      "contenido": "- **Arrastra la esquina** de la hoja, como en un cuaderno de verdad\n- O haz **clic** en la página derecha para avanzar y en la izquierda para volver\n- O usa las flechas del teclado\n- En el celular, **desliza** el dedo\n- Toca una imagen para verla en grande\n- **Esc** te devuelve a la mesa\n\nCada página tiene su número abajo: sirve para pedir correcciones."
+      "contenido": "- **Arrastra la esquina** de la hoja, como en un cuaderno de verdad\n- O haz **clic** en la página derecha para avanzar y en la izquierda para volver\n- O usa las flechas del teclado\n- En el celular, **desliza** el dedo\n- Toca una imagen para verla en grande\n- Toca un **post-it** para levantarlo y leer lo que hay debajo\n- **Esc** te devuelve a la mesa\n\nCada página tiene su número abajo: sirve para pedir correcciones."
     },
     {
       "tipo": "lista",

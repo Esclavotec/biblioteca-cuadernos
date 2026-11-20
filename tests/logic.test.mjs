@@ -4,6 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderMarkdown, renderInline } from '../js/markdown.js';
+import { pageInnerHtml } from '../js/book.js';
 import { safeSrc, contrastText, escapeHtml } from '../js/util.js';
 import { validarFirma, firebaseListo } from '../js/store.js';
 
@@ -52,4 +53,35 @@ test('validarFirma aplica los mismos límites que firestore.rules', () => {
 test('sin config de Firebase se usa modo local', () => {
   assert.equal(firebaseListo(null), false);
   assert.equal(firebaseListo({ apiKey: 'x', projectId: 'p' }), true);
+});
+
+test('markdown: fórmulas sin KaTeX quedan como TeX escapado', () => {
+  const html = renderInline('si $a*b<c$ y *cursiva*');
+  assert.match(html, /<span class="math-raw">a\*b&lt;c<\/span>/, 'el * de la fórmula no debe volverse cursiva');
+  assert.match(html, /<em>cursiva<\/em>/);
+  const block = renderMarkdown('$$\\sum x_i$$');
+  assert.match(block, /^<div class="math-display"><span class="math-raw">\\sum x_i<\/span><\/div>$/);
+  const multi = renderMarkdown('$$\n<b>\n$$');
+  assert.ok(!multi.includes('<b>'), 'el TeX también se escapa');
+});
+
+test('markdown: tintas en línea y en bloque, y sublistas', () => {
+  assert.equal(renderInline('{rojo|Ejm:} hola'), '<span class="tinta tinta-rojo">Ejm:</span> hola');
+  assert.equal(renderInline('{verde|no existe}'), '{verde|no existe}');
+  const html = renderMarkdown(':::azul\nDefinición\n:::\nnota');
+  assert.equal(html, '<div class="tinta tinta-azul"><p>Definición</p></div><p>nota</p>');
+  assert.match(renderMarkdown(':::lapiz\nsin cerrar'), /<\/div>$/);
+  assert.match(renderMarkdown('- a\n  - b'), /<li>a<\/li><li class="sub">b<\/li>/);
+  assert.match(renderMarkdown('2. Caso'), /<ol start="2">/);
+});
+
+test('post-its: el dibujo se puede levantar y se escapa todo', () => {
+  const html = pageInnerHtml({ tipo: 'texto', contenido: 'x', dibujos: [{ src: 'books/a/img/b.svg', pie: '<i>p</i>', debajo: 'debajo **aquí**' }], nota: ['uno', 'dos'] });
+  assert.match(html, /class="postit-slot"/);
+  assert.match(html, /data-act="lift" aria-pressed="false"/);
+  assert.match(html, /<strong>aquí<\/strong>/);
+  assert.ok(!html.includes('<i>p</i>'));
+  assert.equal((html.match(/class="nota"/g) || []).length, 2);
+  const malo = pageInnerHtml({ tipo: 'texto', contenido: 'x', dibujos: [{ src: 'javascript:alert(1)' }] });
+  assert.ok(!malo.includes('javascript:'));
 });

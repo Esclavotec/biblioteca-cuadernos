@@ -33,6 +33,11 @@
   --note-ink: #3a3410;
   --code-bg: rgba(51, 80, 122, .09);
   --heading-ink: #24324a;
+  /* Tintas del cuaderno (cuadernos con "tintas": true) */
+  --tinta-rojo: #c0322a;
+  --tinta-azul: #2c3d9c;
+  --tinta-negro: #1c1f1d;
+  --tinta-lapiz: #62666a;
 
   --font: 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
@@ -275,6 +280,7 @@ button { font: inherit; color: inherit; }
 .page-content p + p { margin-top: var(--lh); }
 .page-content ul, .page-content ol { padding-left: 1.2em; }
 .page-content li::marker { color: var(--paper-ink-2); }
+.page-content li.sub { margin-left: 1.3em; list-style-type: circle; }
 .page-content blockquote { padding-left: .8em; box-shadow: inset 2px 0 0 var(--accent); color: var(--paper-ink-2); }
 .page-content code { font-family: var(--mono); font-size: .84em; background: var(--code-bg); padding: .08em .35em; border-radius: 4px; }
 .page-content mark { background: linear-gradient(180deg, transparent 48%, #fbe68a 48%, #fbe68a 88%, transparent 88%); color: inherit; padding: 0 .1em; }
@@ -300,6 +306,75 @@ button { font: inherit; color: inherit; }
 .page.--right .page-num, .book-frame.portrait .page-num { right: 7cqi; }
 .page.--left .page-num { left: 7cqi; }
 .book-frame.portrait .page.--left .page-num { left: auto; right: 7cqi; }
+
+/* Tintas: rojo títulos · azul definiciones · negro notas · lápiz ejercicios */
+.viewer.tintas .page-content h2, .viewer.tintas .page-content h3, .viewer.tintas .pc-titulo h1 { color: var(--tinta-rojo); }
+.tinta-rojo { color: var(--tinta-rojo); }
+.tinta-azul { color: var(--tinta-azul); }
+.tinta-negro { color: var(--tinta-negro); }
+.tinta-lapiz { color: var(--tinta-lapiz); }
+div.tinta { margin: 0; }
+div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta { margin-top: calc(var(--lh) * .5); }
+.page-content h3 + div.tinta, .page-content h2 + div.tinta { margin-top: 0; }
+.page-content h3 { line-height: var(--lh); margin-top: calc(var(--lh) * .5); }
+.page-content h3:first-child { margin-top: 0; }
+
+/* Fórmulas (KaTeX) */
+.page-content .katex { font-size: 1.06em; }
+.math-display { margin: calc(var(--lh) * .2) 0; overflow-x: auto; overflow-y: hidden; scrollbar-width: none; }
+.math-display .katex-display { margin: 0; }
+.math-raw { font-family: var(--mono); font-size: .84em; }
+.nota .katex { font-size: .78em; }
+
+/* Dibujos como post-its: sujetos arriba, se levantan para ver lo de debajo */
+.postits { display: flex; flex-wrap: wrap; justify-content: center; gap: calc(var(--lh) * .6) 5%; margin-top: calc(var(--lh) * .6); }
+.postit-slot { position: relative; margin: 0; width: 41%; perspective: 900px; }
+.postits.solo .postit-slot { width: 56%; }
+.postit-debajo {
+  position: absolute; inset: 0; padding: 26% 8% 6%; overflow: auto; scrollbar-width: none;
+  display: flex; align-items: center; justify-content: center; text-align: center;
+  font-size: .8em; line-height: 1.35; color: var(--paper-ink);
+  border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(30, 40, 35, .1);
+}
+.postit-debajo .vacio { color: var(--paper-ink-2); font-style: italic; }
+.postit {
+  position: relative; z-index: 1; display: block; width: 100%; padding: 6% 5% 4%; border: 0; cursor: pointer; color: #3b3a30;
+  background: var(--pi); border-radius: 1px 1px 3px 3px;
+  transform-origin: 50% 0; transform: rotate(var(--giro)) rotateX(0deg);
+  transition: transform .55s var(--ease-out), box-shadow .55s var(--ease-out);
+  box-shadow: 0 1px 1px rgba(30, 40, 35, .14), 0 9px 12px -9px rgba(30, 40, 35, .45);
+  backface-visibility: hidden;
+}
+.postit::before { /* franja adhesiva, un poco más oscura */
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 9%; background: rgba(0, 0, 0, .045);
+}
+.postit::after { /* la esquina inferior se curva un poco */
+  content: ''; position: absolute; right: 0; bottom: 0; width: 18%; height: 14%;
+  background: linear-gradient(135deg, transparent 50%, rgba(0, 0, 0, .07) 50%, rgba(255, 255, 255, .25) 100%);
+}
+.postit.amarillo { --pi: #fbeb8f; }
+.postit.rosa { --pi: #f9c6d3; }
+.postit.celeste { --pi: #c4e2f5; }
+.postit.verde { --pi: #cfeebc; }
+.postit img { display: block; width: 100%; height: auto; pointer-events: none; }
+.postit-pie { display: block; margin-top: .2em; font-size: .74em; line-height: 1.25; text-align: center; }
+@media (hover: hover) {
+  .postit-slot:not(.lifted) .postit:hover { transform: rotate(var(--giro)) rotateX(-14deg); box-shadow: 0 1px 1px rgba(30, 40, 35, .14), 0 16px 16px -10px rgba(30, 40, 35, .45); }
+}
+.postit-slot.lifted .postit { transform: rotate(var(--giro)) rotateX(-80deg); box-shadow: 0 1px 1px rgba(30, 40, 35, .1), 0 30px 26px -16px rgba(30, 40, 35, .5); }
+.postit:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.postit-zoom {
+  position: absolute; z-index: 2; top: -.55em; right: -.55em; width: 1.9em; height: 1.9em; display: grid; place-items: center;
+  padding: 0; border: 0; border-radius: 999px; cursor: zoom-in; font-size: max(13px, .8em);
+  background: var(--paper); color: var(--paper-ink); box-shadow: 0 1px 3px rgba(30, 40, 35, .3);
+  opacity: .85;
+}
+.postit-zoom:hover { opacity: 1; }
+.lightbox.dibujo img { background: #fdf6c8; padding: 16px; width: min(92vw, 820px); max-height: calc(100dvh - 110px); object-fit: contain; }
+.book-frame.portrait .postit-slot { width: 46%; }
+.book-frame.portrait .postits.solo .postit-slot { width: 66%; }
+.viewer.tintas .nota { font-size: 1.22em; width: 80%; margin-top: calc(var(--lh) * .6); }
+.viewer.tintas .nota + .nota { transform: rotate(-1.1deg); }
 
 /* Tapas (páginas duras) */
 .cover-face {
@@ -412,5 +487,5 @@ button { font: inherit; color: inherit; }
   .editor { padding: 16px; gap: 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .notebook, .book-frame, .toast, .viewer, .modal { animation: none !important; transition: none !important; }
+  .notebook, .book-frame, .toast, .viewer, .modal, .postit { animation: none !important; transition: none !important; }
 }

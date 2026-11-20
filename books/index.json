@@ -1,6 +1,7 @@
 {
   "libros": [
     { "id": "guia", "titulo": "Cómo usar esta biblioteca", "curso": "Guía", "color": "#33507a" },
+    { "id": "cya-3-rosales", "titulo": "Cálculo y Análisis III", "curso": "Prof. Rosales", "color": "#6b4f7a" },
     { "id": "ejemplo-git", "titulo": "Introducción a Git", "curso": "Curso de ejemplo", "color": "#2f5d50" }
   ]
 }

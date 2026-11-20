@@ -56,7 +56,22 @@ for (const entry of index.libros) {
         assert.ok(safeSrc(p.src), `${where}: src no permitido`);
         if (!/^https?:/i.test(p.src)) assert.ok(existsSync(path.join(root, p.src)), `${where}: no existe ${p.src}`);
       }
-      if (p.nota !== undefined) assert.equal(typeof p.nota, 'string', `${where}: nota debe ser texto`);
+      if (p.nota !== undefined) {
+        const notas = Array.isArray(p.nota) ? p.nota : [p.nota];
+        notas.forEach((n) => assert.equal(typeof n, 'string', `${where}: nota debe ser texto o lista de textos`));
+      }
+      if (p.dibujos !== undefined) {
+        assert.ok(Array.isArray(p.dibujos) && p.dibujos.length, `${where}: dibujos debe ser una lista`);
+        p.dibujos.forEach((d, j) => {
+          assert.ok(safeSrc(d.src), `${where}: dibujo ${j + 1} con src no permitido`);
+          if (!/^https?:/i.test(d.src)) assert.ok(existsSync(path.join(root, d.src)), `${where}: no existe ${d.src}`);
+          for (const k of ['pie', 'debajo', 'alt', 'color']) if (d[k] !== undefined) assert.equal(typeof d[k], 'string', `${where}: dibujo ${j + 1}.${k} debe ser texto`);
+        });
+      }
+      // Las fórmulas $…$ deben ir en pares, si no se ve un $ suelto en la página
+      for (const t of [p.contenido, p.subtitulo, ...(Array.isArray(p.nota) ? p.nota : [p.nota]), ...(p.dibujos || []).flatMap((d) => [d.pie, d.debajo])]) {
+        if (typeof t === 'string') assert.equal((t.match(/\$/g) || []).length % 2, 0, `${where}: hay un $ sin cerrar en «${t.slice(0, 40)}…»`);
+      }
     });
   });
 }

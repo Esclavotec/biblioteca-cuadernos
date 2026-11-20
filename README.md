@@ -16,6 +16,7 @@ No hace falta compilar nada: es HTML, CSS y JavaScript puro, así que funciona d
 | Pasar la hoja | **Arrastrar la esquina**, clic en la página o flechas → ← | **Arrastrar la esquina**, deslizar o tocar la página |
 | Ir a la portada / al final | `Inicio` / `Fin` | Botones ‹ › |
 | Ver una imagen en grande | Clic en la imagen | Toque |
+| Levantar un dibujo (post-it) y leer lo de debajo | Clic en el post-it (otra vez para bajarlo) · lupa para ampliar | Toque |
 | Volver a la mesa | `Esc` o **Biblioteca** | Botón ← |
 | Firmar el cuaderno de visitas | **Firmar** (arriba) o **Firmar en esta hoja** | Igual |
 
@@ -46,7 +47,9 @@ biblioteca-cuadernos/
 ├── firestore.rules         Seguridad del cuaderno de visitas
 ├── firebase.json           Para desplegar las reglas con Firebase CLI
 ├── tests/                  Tests automáticos (node --test)
-└── tools/serve.mjs         Servidor local sin dependencias
+└── tools/
+    ├── serve.mjs           Servidor local sin dependencias
+    └── dibujos/            Generadores de los dibujos SVG (lib.mjs + uno por cuaderno)
 ```
 
 ```mermaid
@@ -96,13 +99,32 @@ flowchart LR
 | `lista` | `titulo`?, `items[]` | Comandos, pasos, ideas (con ✓) |
 | `imagen` | `src`, `titulo`?, `pie`? | Fotos o esquemas del material |
 
-Cualquier página acepta `"nota"`, que se muestra como una nota adhesiva amarilla.
+Cualquier página acepta `"nota"` (un texto o una lista de textos), que se muestra como una nota adhesiva amarilla.
+
+**Dibujos como post-its** (`dibujos`, en cualquier página): cada dibujo se pega como un post-it de color sujeto por arriba. Al tocarlo se levanta sin despegarse y deja ver lo que hay escrito debajo.
+
+```json
+"dibujos": [
+  { "src": "books/mi-curso/img/esfera.svg", "pie": "Esfera unitaria", "debajo": "Puntos a distancia 1 del origen" }
+]
+```
+Campos opcionales: `alt` (texto para lectores de pantalla) y `color` (`amarillo`, `rosa`, `celeste` o `verde`; si no se indica, se van alternando).
+
+**Tintas** (`"tintas": true` en el cuaderno): los títulos salen en rojo, como en el cuaderno de papel. Dentro del texto:
+
+| Escribe | Sale |
+|---|---|
+| `:::azul` … `:::` | Bloque en tinta azul (definiciones) |
+| `:::lapiz` … `:::` | Bloque en gris lápiz (ejemplos y ejercicios) |
+| `{rojo\|Ejm:}` | Una palabra en rojo (también `azul`, `negro`, `lapiz`) |
+
+**Fórmulas** con [KaTeX](https://katex.org): `$x^2$` dentro de la línea y `$$\sum x_i$$` en una línea propia para una fórmula centrada. Si una fórmula centrada no cabe a lo ancho, se achica sola (hasta el 60 %). Si el CDN de KaTeX no carga, se ve el código TeX.
 
 **Papel** (`papel`): `rayado` (por defecto), `cuadriculado` o `blanco`.
 
 **Color de tapa** (`color`): usa tonos apagados para que la mesa se vea armónica. Algunos que combinan: `#2f5d50` (verde), `#33507a` (azul), `#3b3f3d` (grafito), `#6b4f7a` (ciruela) y `#8a5a2b` (tabaco).
 
-**Formato del texto:** `**negrita**`, `*cursiva*`, `` `código` ``, `==resaltado==`, `# título`, `- lista`, `1. lista`, `> cita`. El HTML siempre se escapa, así que nadie puede inyectar código.
+**Formato del texto:** `**negrita**`, `*cursiva*`, `` `código` ``, `==resaltado==`, `# título`, `- lista` (con dos espacios delante, sublista), `1. lista` (respeta el número de inicio), `> cita`. El HTML siempre se escapa, así que nadie puede inyectar código.
 
 ---
 
@@ -148,6 +170,8 @@ Se cargan las 150 firmas más recientes.
 | Pase de página | [StPageFlip](https://github.com/Nodlik/StPageFlip) 2.0.7 (MIT), con la hoja curvada y sombra dinámica. Las tapas son rígidas y las hojas, blandas |
 | Accesibilidad | Funciona con teclado y respeta *reducir movimiento* (sin animación). El texto del papel escala con el tamaño de la hoja |
 
+Los dibujos de cada cuaderno se generan con un script (`node tools/dibujos/cya-3-rosales.mjs`). Usan una proyección 3D real, así que los contornos de esferas, conos y paraboloides son exactos, pero llevan un filtro con grano de lápiz.
+
 Si el CDN de StPageFlip no carga, el visor muestra las páginas una a una sin animación, para que el contenido siga siendo accesible.
 
 El boceto original está en Claude Design, en el lienzo *Biblioteca de cuadernos · Mesa de estudio*.
@@ -166,6 +190,14 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.3 (2026-11-20). Primer cuaderno real: Cálculo y Análisis III (Prof. Rosales).**
+  - 38 páginas con la materia del I parcial: ℝⁿ, norma, Cauchy-Schwarz, desigualdad triangular, producto interno, rectas, esferas, proyección estereográfica, cilindros, cuádricas, curvas y planos.
+  - **Tintas** como en el cuaderno de papel: rojo para títulos, azul para definiciones, negro para notas y lápiz para ejemplos y ejercicios.
+  - **Fórmulas con KaTeX** 0.16.11, con ajuste automático de ancho.
+  - **Dibujos como post-its** que se levantan para ver lo de debajo. Son 24 dibujos SVG, generados con `tools/dibujos/`.
+  - Las notas amarillas son aclaraciones añadidas al pasar el cuaderno: correcciones de signos, pasos que faltaban y respuestas para comprobar los ejercicios.
+  - Una página puede tener varias notas, y las listas aceptan sublistas.
 
 - **v1.2 (2026-11-20). Firebase conectado.** Se creó el proyecto `biblioteca-cuadernos-vm5q` (plan Spark) con Firestore en `nam5` y se publicaron las reglas. La configuración web está en `js/firebase-config.js` y el proyecto, en `.firebaserc`. Ahora el cuaderno de visitas es compartido.
   - Pruebas: una firma de texto y otra con dibujo se aceptaron. Las reglas rechazaron un campo extra, un nombre vacío, un dibujo SVG, una fecha falsa, el borrado desde la web y la lectura de otras colecciones.

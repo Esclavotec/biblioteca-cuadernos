@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 260" font-family="Segoe Print, Comic Sans MS, cursive">
+  <rect width="480" height="260" fill="#ffffff"/>
+  <!-- main -->
+  <path d="M40 180 H440" stroke="#1f3b73" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <!-- rama -->
+  <path d="M130 180 C170 180 170 90 210 90 H330 C370 90 370 180 400 180" stroke="#d9822b" stroke-width="5" stroke-linecap="round" fill="none" stroke-dasharray="0"/>
+  <g fill="#1f3b73">
+    <circle cx="60" cy="180" r="13"/><circle cx="130" cy="180" r="13"/><circle cx="260" cy="180" r="13"/><circle cx="400" cy="180" r="15"/>
+  </g>
+  <g fill="#d9822b">
+    <circle cx="220" cy="90" r="13"/><circle cx="280" cy="90" r="13"/><circle cx="330" cy="90" r="13"/>
+  </g>
+  <text x="40" y="225" font-size="22" fill="#1f3b73">main</text>
+  <text x="205" y="55" font-size="22" fill="#d9822b">nueva-idea</text>
+  <text x="372" y="225" font-size="20" fill="#2b2a33">merge</text>
+</svg>

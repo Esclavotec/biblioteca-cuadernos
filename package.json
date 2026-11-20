@@ -1,0 +1,11 @@
+{
+  "name": "biblioteca-cuadernos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Biblioteca de cuadernos de cursos con cuaderno de visitas",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test"
+  }
+}

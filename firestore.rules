@@ -1,0 +1,31 @@
+rules_version = '2';
+
+// Cuaderno de visitas: cualquiera puede LEER y CREAR una firma válida.
+// Nadie puede editar ni borrar desde la web (solo tú, desde la consola de Firebase).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /firmas/{firmaId} {
+      allow read: if true;
+
+      allow create: if request.resource.data.keys().hasOnly(['nombre', 'texto', 'dibujo', 'fecha'])
+        && request.resource.data.keys().hasAll(['nombre', 'texto', 'dibujo', 'fecha'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 60
+        && request.resource.data.texto is string
+        && request.resource.data.texto.size() <= 500
+        && request.resource.data.dibujo is string
+        && request.resource.data.dibujo.size() <= 400000
+        && (request.resource.data.dibujo == ''
+            || request.resource.data.dibujo.matches('^data:image/jpeg;base64,[A-Za-z0-9+/=]+$'))
+        && (request.resource.data.texto.size() > 0 || request.resource.data.dibujo.size() > 0)
+        && request.resource.data.fecha == request.time;
+
+      allow update, delete: if false;
+    }
+    // Todo lo demás, cerrado
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "id": "guia",
+  "titulo": "Cómo usar esta biblioteca",
+  "curso": "Guía",
+  "subtitulo": "Lee esto primero",
+  "color": "#33507a",
+  "papel": "cuadriculado",
+  "paginas": [
+    {
+      "tipo": "titulo",
+      "titulo": "Bienvenido a mi biblioteca",
+      "subtitulo": "Aquí guardo, en forma de cuadernos, todo lo que voy aprendiendo en mis cursos."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Cómo leer",
+      "contenido": "- **Arrastra la esquina** de la hoja, como en un cuaderno de verdad\n- O haz **clic** en la página derecha para avanzar y en la izquierda para volver\n- O usa las flechas del teclado\n- En el celular, **desliza** el dedo\n- Toca una imagen para verla en grande\n- **Esc** te devuelve a la mesa\n\nCada página tiene su número abajo: sirve para pedir correcciones."
+    },
+    {
+      "tipo": "lista",
+      "titulo": "Qué hay en un cuaderno",
+      "items": [
+        "Páginas de **título** para separar temas",
+        "**Apuntes** con negritas, listas y ==resaltados==",
+        "**Listas** de comandos, pasos o ideas",
+        "**Fotos y esquemas** del material del curso",
+        "Notas amarillas con *dudas o recordatorios*"
+      ],
+      "nota": "El cuaderno blanco de la mesa es para ti. Fírmalo"
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Cuaderno de visitas",
+      "contenido": "El cuaderno blanco de la mesa es para quien pase por aquí.\n\n1. Ábrelo y pulsa **Firmar**\n2. Dibuja con los lápices de colores\n3. Escribe tu nombre y un mensaje\n4. Pulsa **Guardar en el cuaderno**\n\nTu hoja queda como una página nueva."
+    }
+  ]
+}

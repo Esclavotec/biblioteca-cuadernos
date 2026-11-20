@@ -1,0 +1,6 @@
+{
+  "libros": [
+    { "id": "guia", "titulo": "Cómo usar esta biblioteca", "curso": "Guía", "color": "#33507a" },
+    { "id": "ejemplo-git", "titulo": "Introducción a Git", "curso": "Curso de ejemplo", "color": "#2f5d50" }
+  ]
+}

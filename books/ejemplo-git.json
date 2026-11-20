@@ -1,0 +1,49 @@
+{
+  "id": "ejemplo-git",
+  "titulo": "Introducción a Git",
+  "curso": "Curso de ejemplo",
+  "subtitulo": "Módulo 1 · Apuntes",
+  "color": "#2f5d50",
+  "papel": "rayado",
+  "fecha": "2026-11-20",
+  "paginas": [
+    {
+      "tipo": "titulo",
+      "titulo": "Introducción a Git",
+      "subtitulo": "Cuaderno de **ejemplo** para ver cómo se ven los apuntes. Lo reemplazaremos por tus cursos reales."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "¿Qué es Git?",
+      "contenido": "Git es un **sistema de control de versiones**: guarda la historia de un proyecto como una serie de *fotos* llamadas commits.\n\n- Funciona en local, sin internet\n- Cada commit tiene autor, fecha y mensaje\n- Permite volver atrás si algo se rompe\n\n> Idea clave: ==haz commits seguido y con mensajes claros==",
+      "nota": "Preguntar al profe la diferencia con SVN"
+    },
+    {
+      "tipo": "lista",
+      "titulo": "Comandos básicos",
+      "items": [
+        "`git init` — crea un repositorio",
+        "`git add archivo` — prepara cambios",
+        "`git commit -m \"mensaje\"` — guarda una foto",
+        "`git status` — qué cambió",
+        "`git log` — ver la historia"
+      ]
+    },
+    {
+      "tipo": "imagen",
+      "titulo": "Ramas",
+      "src": "books/ejemplo-git/img/ramas.svg",
+      "pie": "main y una rama de trabajo que se une con merge"
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Trabajar con ramas",
+      "contenido": "Una **rama** es una línea de trabajo paralela.\n\n1. `git switch -c nueva-idea`\n2. Haces commits sin tocar `main`\n3. `git switch main`\n4. `git merge nueva-idea`\n\nSi dos ramas cambian la misma línea aparece un *conflicto* y hay que elegir a mano."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Resumen",
+      "contenido": "# Para el examen\n- Commit = foto del proyecto\n- Rama = línea paralela\n- Merge = unir ramas\n\n*Fin del módulo 1.*"
+    }
+  ]
+}

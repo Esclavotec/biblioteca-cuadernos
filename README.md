@@ -108,14 +108,26 @@ Cualquier página acepta `"nota"`, que se muestra como una nota adhesiva amarill
 
 ## Cuaderno de visitas y Firebase
 
-- **Sin Firebase**, `firebaseConfig = null` y el cuaderno funciona en **modo local**: cada visitante solo ve sus propias firmas, guardadas en su navegador. En la barra aparece la etiqueta *Modo local*.
-- **Con Firebase**, las firmas se guardan en Firestore, en la colección `firmas`, y todos las ven.
+**Estado actual: conectado.** Las firmas se guardan en Firestore y todos los visitantes las ven.
 
-Para conectarlo:
+| Dato | Valor |
+|---|---|
+| Proyecto | `biblioteca-cuadernos-vm5q` ([consola](https://console.firebase.google.com/project/biblioteca-cuadernos-vm5q/firestore)) |
+| Plan | **Spark, gratuito**, sin tarjeta y sin cuenta de facturación, así que no puede generar cobros |
+| Base de datos | Firestore `(default)` en `nam5` (EE. UU.) |
+| Colección | `firmas` con `{ nombre, texto, dibujo, fecha }` |
+| Límites gratuitos | 1 GiB de datos, 50 000 lecturas y 20 000 escrituras al día. Si se supera, deja de responder hasta el día siguiente (no cobra) |
+
+**Borrar una firma inapropiada:** en la consola, entra en *Firestore Database* → `firmas`, abre el documento y elige *Eliminar documento*. Desde la web nadie puede borrar ni editar.
+
+**Sin Firebase** (si `firebaseConfig` vale `null`), el cuaderno vuelve al **modo local**: cada visitante solo ve sus propias firmas, guardadas en su navegador, y la barra muestra *Modo local*.
+
+Para conectarlo a otro proyecto:
 
 1. Crea un proyecto en [console.firebase.google.com](https://console.firebase.google.com) y activa **Firestore Database**.
 2. Agrega una **app web** y copia su `firebaseConfig` dentro de `js/firebase-config.js`.
-3. Publica las reglas: `npx firebase-tools login`, y luego `npx firebase-tools deploy --only firestore:rules --project <id>`.
+3. Publica las reglas: `npx firebase-tools login`, y luego `npx firebase-tools deploy --only firestore:rules --project <id>`. En Windows, si PowerShell bloquea `npx`, usa `npx.cmd`.
+4. Si al estrenar la base de datos todo da *permission-denied*, vuelve a publicar las reglas: las primeras pueden haberse aplicado antes de que la base de datos estuviera lista.
 
 **Seguridad.** Las reglas solo permiten *leer* y *crear* firmas. Cada firma debe tener nombre (1–60 caracteres), un mensaje de hasta 500 caracteres y un dibujo JPEG de hasta unos 400 KB. Nadie puede editar ni borrar desde la web. Para borrar una firma inapropiada, entra en la consola de Firebase. `store.js` valida lo mismo antes de enviar.
 
@@ -154,6 +166,9 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.2 (2026-11-20). Firebase conectado.** Se creó el proyecto `biblioteca-cuadernos-vm5q` (plan Spark) con Firestore en `nam5` y se publicaron las reglas. La configuración web está en `js/firebase-config.js` y el proyecto, en `.firebaserc`. Ahora el cuaderno de visitas es compartido.
+  - Pruebas: una firma de texto y otra con dibujo se aceptaron. Las reglas rechazaron un campo extra, un nombre vacío, un dibujo SVG, una fecha falsa, el borrado desde la web y la lectura de otras colecciones.
 
 - **v1.1 (2026-11-20). Rediseño "Mesa de estudio".**
   - La estantería de madera se cambió por cuadernos vistos desde arriba sobre una mesa clara, con una nota adhesiva de ayuda y el cuaderno de visitas con su bolígrafo.

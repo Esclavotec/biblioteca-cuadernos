@@ -19,4 +19,12 @@
  * Esta config es pública por diseño (va en el navegador). La seguridad la dan las reglas de
  * firestore.rules, que solo permiten LEER y CREAR firmas válidas, nunca editar ni borrar.
  */
-export const firebaseConfig = null;
+// Proyecto: biblioteca-cuadernos-vm5q (plan Spark gratuito, Firestore en nam5)
+export const firebaseConfig = {
+  apiKey: 'AIzaSyBWZ_BsBYqFtiP1ze5nt9dTUZkhJ-B_w58',
+  authDomain: 'biblioteca-cuadernos-vm5q.firebaseapp.com',
+  projectId: 'biblioteca-cuadernos-vm5q',
+  storageBucket: 'biblioteca-cuadernos-vm5q.firebasestorage.app',
+  messagingSenderId: '595739744544',
+  appId: '1:595739744544:web:6f6aa19ff0e9047b22df45',
+};

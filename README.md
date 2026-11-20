@@ -118,7 +118,7 @@ Campos opcionales: `alt` (texto para lectores de pantalla) y `color` (`amarillo`
 | `:::lapiz` … `:::` | Bloque en gris lápiz (ejemplos y ejercicios) |
 | `{rojo\|Ejm:}` | Una palabra en rojo (también `azul`, `negro`, `lapiz`) |
 
-**Fórmulas** con [KaTeX](https://katex.org): `$x^2$` dentro de la línea y `$$\sum x_i$$` en una línea propia para una fórmula centrada. Si una fórmula centrada no cabe a lo ancho, se achica sola (hasta el 60 %). Si el CDN de KaTeX no carga, se ve el código TeX.
+**Fórmulas** con [KaTeX](https://katex.org): `$x^2$` dentro de la línea y `$$\sum x_i$$` en una línea propia para una fórmula centrada. Una fórmula del texto nunca se parte en dos renglones: si no cabe, pasa entera a la línea siguiente, centrada. Una fórmula centrada demasiado ancha se reparte en varias líneas con `\begin{aligned}`; como último recurso se achica un poco (hasta el 60 %). Si el CDN de KaTeX no carga, se ve el código TeX.
 
 **Papel** (`papel`): `rayado` (por defecto), `cuadriculado` o `blanco`.
 
@@ -196,7 +196,8 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
   - **Tintas** como en el cuaderno de papel: rojo para títulos, azul para definiciones, negro para notas y lápiz para ejemplos y ejercicios.
   - **Fórmulas con KaTeX** 0.16.11, con ajuste automático de ancho.
   - **Dibujos como post-its** que se levantan para ver lo de debajo. Son 24 dibujos SVG, generados con `tools/dibujos/`.
-  - Las notas amarillas son aclaraciones añadidas al pasar el cuaderno: correcciones de signos, pasos que faltaban y respuestas para comprobar los ejercicios.
+  - Notas amarillas con apuntes extra: pasos intermedios, signos a cuidar y resultados para comprobar los ejercicios.
+  - Las fórmulas que no caben en el renglón pasan enteras a la línea siguiente, centradas.
   - Una página puede tener varias notas, y las listas aceptan sublistas.
 
 - **v1.2 (2026-11-20). Firebase conectado.** Se creó el proyecto `biblioteca-cuadernos-vm5q` (plan Spark) con Firestore en `nam5` y se publicaron las reglas. La configuración web está en `js/firebase-config.js` y el proyecto, en `.firebaserc`. Ahora el cuaderno de visitas es compartido.

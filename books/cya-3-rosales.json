@@ -12,7 +12,7 @@
       "tipo": "titulo",
       "titulo": "Cálculo y Análisis III",
       "subtitulo": "Prof. José Rosales · materia del **I parcial** (en progreso)",
-      "nota": "Rojo: títulos · Azul: definiciones · Negro: notas · Lápiz: ejemplos y ejercicios. Las notas amarillas son aclaraciones."
+      "nota": "Rojo: títulos · Azul: definiciones · Negro: notas · Lápiz: ejemplos y ejercicios."
     },
     {
       "tipo": "texto",
@@ -23,7 +23,7 @@
       "tipo": "texto",
       "titulo": "Libros y software",
       "contenido": "### Libros\n- Bartle\n- Apostol\n- Thomas — *Calculus*\n\n### Software\n- GeoGebra\n- Claude\n- Wolfram",
-      "nota": "En el cuaderno, Bartle y Apostol quedaron sin título. Seguramente son *Introducción al análisis matemático* (Bartle y Sherbert) y *Calculus*, vol. 2 (Apostol). Conviene confirmarlo con el profe."
+      "nota": "Bartle: *Introducción al análisis matemático* (Bartle y Sherbert). Apostol: *Calculus*, vol. 2."
     },
     {
       "tipo": "texto",
@@ -46,7 +46,7 @@
           "debajo": "En $\\mathbb{R}^3$ se baja primero al plano $xy$ y de ahí a los ejes $x$ y $y$. La altura es $x_3$."
         }
       ],
-      "nota": "En el dibujo de ℝ³ del cuaderno los ejes quedaron con otros nombres (z hacia abajo). Aquí se usa la orientación de siempre: x hacia ti, y a la derecha, z hacia arriba."
+      "nota": "Ejes en ℝ³ (regla de la mano derecha): x hacia ti, y a la derecha, z hacia arriba."
     },
     {
       "tipo": "texto",
@@ -66,25 +66,25 @@
       "tipo": "texto",
       "titulo": "Norma",
       "contenido": ":::azul\nSea $\\vec{x} \\in \\mathbb{R}^n$. Entonces la norma se define como:\n\n$$\\|\\vec{x}\\| = \\|(x_1, \\dots, x_n)\\| = \\sqrt{x_1^2 + x_2^2 + \\dots + x_n^2}$$\n\nY esta representa la **distancia del punto al origen**.\n:::\n\n### Ejm\n:::lapiz\nEn $\\mathbb{R}^4$:\n$$\\begin{aligned} \\|(1, 3, 0, \\sqrt{6})\\| &= \\sqrt{1^2 + 3^2 + 0^2 + (\\sqrt{6})^2} \\\\ &= \\sqrt{1 + 9 + 0 + 6} = \\sqrt{16} = 4 \\end{aligned}$$\n:::",
-      "nota": "En el cuaderno dice $\\vec{x} \\in \\mathbb{R}$ y al final $+\\,x_n$ sin el cuadrado. Lo correcto es $\\vec{x} \\in \\mathbb{R}^n$ y $x_n^2$."
+      "nota": "Todos los términos van al cuadrado, también $x_n^2$. Por eso la norma nunca es negativa."
     },
     {
       "tipo": "texto",
       "titulo": "Teorema: la norma es positiva",
-      "contenido": ":::azul\nSean $\\vec{x}, \\vec{y} \\in \\mathbb{R}^n$ y $a \\in \\mathbb{R}$:\n:::\n\n**1)** $\\|\\vec{x}\\| \\ge 0$ ; $\\|\\vec{x}\\| = 0 \\iff \\vec{x} = \\vec{0}$\n\n**Dem:** prueba por casos.\n\n**1. Caso:** $\\vec{x} = \\vec{0}$\n$$\\|\\vec{x}\\| = \\|\\vec{0}\\| = \\|(0, \\dots, 0)\\| = \\sqrt{0^2 + \\dots + 0^2} = 0$$\n\n**2. Caso:** $\\vec{x} \\neq \\vec{0} \\Rightarrow (x_1, \\dots, x_n) \\neq (0, \\dots, 0)$. Por lo anterior, $\\exists\\, x_i \\neq 0$:\n$$\\|\\vec{x}\\| = \\sqrt{x_1^2 + \\dots + x_i^2 + \\dots + x_n^2} \\ge \\sqrt{x_i^2} = |x_i| > 0$$\n\n$\\therefore\\ \\|\\vec{x}\\| \\ge 0$",
-      "nota": "Ojo: $\\|\\vec{x}\\|$ es un número, así que se iguala a $0$ y no al vector $\\vec{0}$. Y en el caso 2 en realidad sale $\\|\\vec{x}\\| > 0$: eso prueba la ida del «si y solo si»."
+      "contenido": ":::azul\nSean $\\vec{x}, \\vec{y} \\in \\mathbb{R}^n$ y $a \\in \\mathbb{R}$:\n:::\n\n**1)** $\\|\\vec{x}\\| \\ge 0$ ; $\\|\\vec{x}\\| = 0 \\iff \\vec{x} = \\vec{0}$\n\n**Dem:** prueba por casos.\n\n**1. Caso:** $\\vec{x} = \\vec{0}$\n$$\\begin{aligned} \\|\\vec{x}\\| &= \\|\\vec{0}\\| = \\|(0, \\dots, 0)\\| \\\\ &= \\sqrt{0^2 + \\dots + 0^2} = 0 \\end{aligned}$$\n\n**2. Caso:** $\\vec{x} \\neq \\vec{0} \\Rightarrow (x_1, \\dots, x_n) \\neq (0, \\dots, 0)$. Por lo anterior, $\\exists\\, x_i \\neq 0$:\n$$\\begin{aligned} \\|\\vec{x}\\| &= \\sqrt{x_1^2 + \\dots + x_i^2 + \\dots + x_n^2} \\\\ &\\ge \\sqrt{x_i^2} = |x_i| > 0 \\end{aligned}$$\n\n$\\therefore\\ \\|\\vec{x}\\| \\ge 0$",
+      "nota": "$\\|\\vec{x}\\|$ es un número: se iguala a $0$, no a $\\vec{0}$."
     },
     {
       "tipo": "texto",
       "titulo": "Cauchy-Schwarz",
       "contenido": ":::azul\n**2) Cauchy-Schwarz:**\n$$|x_1 y_1 + x_2 y_2 + \\dots + x_n y_n| \\le \\|\\vec{x}\\| \\cdot \\|\\vec{y}\\|$$\no, con sumatorias:\n$$\\Big|\\sum_{i=1}^n x_i y_i\\Big| \\le \\sqrt{\\sum_{i=1}^n x_i^2} \\cdot \\sqrt{\\sum_{i=1}^n y_i^2}$$\n:::\n\n**Dem:** prueba por casos.",
-      "nota": "En el cuaderno, dentro del $|\\sum|$ faltó escribir $x_i y_i$."
+      "nota": "La suma $\\sum x_i y_i$ es el producto interno $\\langle \\vec{x}, \\vec{y} \\rangle$."
     },
     {
       "tipo": "texto",
       "titulo": "Cauchy-Schwarz: caso 1",
       "contenido": "**1. Caso:** $\\vec{x} = a\\vec{y} \\Rightarrow \\vec{x} = (ay_1, \\dots, ay_n)$\n$$\\begin{aligned} |x_1y_1 + \\dots + x_ny_n| &= \\|\\vec{x}\\| \\cdot \\|\\vec{y}\\| \\\\ |ay_1^2 + \\dots + ay_n^2| &= \\|a\\vec{y}\\| \\cdot \\|\\vec{y}\\| \\\\ |a|(y_1^2 + \\dots + y_n^2) &= |a|\\,\\|\\vec{y}\\| \\cdot \\|\\vec{y}\\| \\\\ |a|\\,\\|\\vec{y}\\|^2 &= |a|\\,\\|\\vec{y}\\|^2 \\end{aligned}$$",
-      "nota": "Para que la prueba no parta de lo que se quiere probar: calcula cada lado por separado. Ambos dan $|a|\\,\\|\\vec{y}\\|^2$, así que se cumple la igualdad."
+      "nota": "Cada lado por separado da $|a|\\,\\|\\vec{y}\\|^2$: en este caso se cumple la igualdad."
     },
     {
       "tipo": "texto",
@@ -94,16 +94,15 @@
         {
           "src": "books/cya-3-rosales/img/parabola-cs.svg",
           "pie": "$a\\lambda^2 + b\\lambda + c > 0$",
-          "debajo": "Si una parábola que abre hacia arriba es siempre positiva, no tiene raíces reales: su discriminante es negativo."
+          "debajo": "Parábola siempre positiva: no tiene raíces reales y $\\Delta < 0$. Aquí $a = \\sum y_i^2$, $b = -2\\sum y_i x_i$, $c = \\sum x_i^2$."
         }
-      ],
-      "nota": "Aquí $a = \\sum y_i^2$, $b = -2\\sum y_i x_i$ y $c = \\sum x_i^2$."
+      ]
     },
     {
       "tipo": "texto",
       "titulo": "Cauchy-Schwarz: el discriminante",
-      "contenido": "De lo anterior, la parábola nunca toca el eje, así que:\n$$\\begin{aligned} \\Delta = b^2 - 4ac &< 0 \\\\ 4\\Big(\\sum y_i x_i\\Big)^2 - 4\\Big(\\sum y_i^2\\Big)\\Big(\\sum x_i^2\\Big) &< 0 \\\\ \\Big(\\sum y_i x_i\\Big)^2 &< \\Big(\\sum y_i^2\\Big)\\Big(\\sum x_i^2\\Big) \\\\ \\Big|\\sum y_i x_i\\Big| &< \\|\\vec{y}\\| \\cdot \\|\\vec{x}\\| \\end{aligned}$$",
-      "nota": "La última línea del cuaderno ($\\|x_i \\cdot y_i\\| < \\dots$) es la misma desigualdad escrita con producto interno: $|\\langle \\vec{x}, \\vec{y} \\rangle| < \\|\\vec{x}\\|\\,\\|\\vec{y}\\|$."
+      "contenido": "De lo anterior, la parábola nunca toca el eje, así que:\n$$\\begin{aligned} \\Delta = b^2 - 4ac &< 0 \\\\ 4\\Big(\\sum y_i x_i\\Big)^2 &< 4\\Big(\\sum y_i^2\\Big)\\Big(\\sum x_i^2\\Big) \\\\ \\Big(\\sum y_i x_i\\Big)^2 &< \\Big(\\sum y_i^2\\Big)\\Big(\\sum x_i^2\\Big) \\\\ \\Big|\\sum y_i x_i\\Big| &< \\|\\vec{y}\\| \\cdot \\|\\vec{x}\\| \\end{aligned}$$",
+      "nota": "Con producto interno: $|\\langle \\vec{x}, \\vec{y} \\rangle| < \\|\\vec{x}\\|\\,\\|\\vec{y}\\|$."
     },
     {
       "tipo": "texto",
@@ -114,7 +113,7 @@
     {
       "tipo": "texto",
       "titulo": "Producto interno",
-      "contenido": ":::azul\nSi $\\vec{x}, \\vec{y} \\in \\mathbb{R}^n$, entonces:\n$$\\vec{x} \\cdot \\vec{y} = \\langle \\vec{x}, \\vec{y} \\rangle := x_1y_1 + \\dots + x_ny_n = \\sum_{i=1}^n x_iy_i$$\n:::\n\n### Ejm\n:::lapiz\nEn $\\mathbb{R}^5$: $\\vec{x} = (0, -1, 2, 3, 0)$ y $\\vec{y} = (0, 6, 1, 1, 0)$\n$$\\begin{aligned} \\vec{x} \\cdot \\vec{y} = \\langle \\vec{x}, \\vec{y} \\rangle &= 0 \\cdot 0 + (-1) \\cdot 6 + 2 \\cdot 1 + 3 \\cdot 1 + 0 \\cdot 0 \\\\ &= 0 - 6 + 2 + 3 + 0 = -1 \\end{aligned}$$\n:::"
+      "contenido": ":::azul\nSi $\\vec{x}, \\vec{y} \\in \\mathbb{R}^n$, entonces:\n$$\\vec{x} \\cdot \\vec{y} = \\langle \\vec{x}, \\vec{y} \\rangle := x_1y_1 + \\dots + x_ny_n = \\sum_{i=1}^n x_iy_i$$\n:::\n\n### Ejm\n:::lapiz\nEn $\\mathbb{R}^5$: $\\vec{x} = (0, -1, 2, 3, 0)$ y $\\vec{y} = (0, 6, 1, 1, 0)$\n$$\\begin{aligned} \\langle \\vec{x}, \\vec{y} \\rangle &= 0 \\cdot 0 + (-1) \\cdot 6 + 2 \\cdot 1 \\\\ &\\quad + 3 \\cdot 1 + 0 \\cdot 0 \\\\ &= 0 - 6 + 2 + 3 + 0 \\\\ &= -1 \\end{aligned}$$\n:::"
     },
     {
       "tipo": "texto",
@@ -139,7 +138,7 @@
         }
       ],
       "nota": [
-        "En el cuaderno dice «Normático»: el nombre usual es espacio **normado**.",
+        "Normado: tiene norma. Hilbert: tiene producto interno y es completo.",
         "Para el ejercicio: desarrolla los dos productos internos y suma. Los términos $\\pm 2\\langle \\vec{x}, \\vec{y} \\rangle$ se cancelan."
       ]
     },
@@ -165,7 +164,7 @@
     {
       "tipo": "texto",
       "titulo": "Rectas en ℝⁿ",
-      "contenido": ":::azul\nLa recta se define como:\n:::\n$$\\begin{aligned} (x, y, z) &= (x_0, y_0, z_0) + \\lambda \\cdot \\vec{v} \\\\ &= (x_0, y_0, z_0) + \\lambda(v_1, v_2, v_3) \\\\ &= (x_0 + \\lambda v_1,\\ y_0 + \\lambda v_2,\\ z_0 + \\lambda v_3), \\quad \\lambda \\in \\mathbb{R} \\end{aligned}$$\n\n### Ecuación paramétrica\n:::azul\nSe define como:\n:::\n$$\\begin{cases} x = x_0 + \\lambda v_1 \\\\ y = y_0 + \\lambda v_2 \\\\ z = z_0 + \\lambda v_3 \\end{cases}$$",
+      "contenido": ":::azul\nLa recta se define como:\n:::\n$$\\begin{aligned} (x, y, z) &= (x_0, y_0, z_0) + \\lambda \\cdot \\vec{v} \\\\ &= (x_0, y_0, z_0) + \\lambda(v_1, v_2, v_3) \\\\ &= (x_0 + \\lambda v_1,\\ y_0 + \\lambda v_2,\\ z_0 + \\lambda v_3) \\end{aligned}$$\n\ncon $\\lambda \\in \\mathbb{R}$.\n\n### Ecuación paramétrica\n:::azul\nSe define como:\n:::\n$$\\begin{cases} x = x_0 + \\lambda v_1 \\\\ y = y_0 + \\lambda v_2 \\\\ z = z_0 + \\lambda v_3 \\end{cases}$$",
       "dibujos": [
         {
           "src": "books/cya-3-rosales/img/recta-r3.svg",
@@ -218,13 +217,13 @@
           "debajo": "Desde el polo norte $N = (0, 0, 1)$ se traza la recta que pasa por $P$; donde corta el plano $z = 0$ está $\\pi_N(P)$."
         }
       ],
-      "nota": "Se quita $N$ porque ahí $z = 1$ y se dividiría entre 0. En el cuaderno se escribió $S^2 = S^2 \\setminus \\{N\\}$ para abreviar."
+      "nota": "Se quita $N$ porque ahí $z = 1$ y se dividiría entre 0."
     },
     {
       "tipo": "texto",
       "titulo": "Proyección: el valor de λ",
       "contenido": "Busque para qué valor de $\\lambda$ dicha línea corta el plano $z = 0$:\n$$L = (\\lambda x,\\ \\lambda y,\\ 1 + \\lambda(z - 1))$$\n\nSolo interesa la tercera coordenada:\n$$0 = 1 + \\lambda(z - 1) \\Rightarrow \\lambda = \\frac{1}{1 - z}$$\n$$\\Rightarrow\\ \\lambda x = \\frac{x}{1 - z}, \\qquad \\lambda y = \\frac{y}{1 - z}$$\n\n$$\\therefore\\ \\pi_N(x, y, z) = \\left(\\frac{x}{1 - z},\\ \\frac{y}{1 - z}\\right)$$",
-      "nota": "Corrección de signo: en el cuaderno quedó $\\lambda = \\frac{1}{z - 1}$. Despejando $0 = 1 + \\lambda(z - 1)$ sale $\\lambda = -\\frac{1}{z - 1} = \\frac{1}{1 - z}$."
+      "nota": "Ojo con el signo: de $0 = 1 + \\lambda(z - 1)$ sale $\\lambda = -\\frac{1}{z - 1} = \\frac{1}{1 - z}$."
     },
     {
       "tipo": "texto",
@@ -278,8 +277,8 @@
         }
       ],
       "nota": [
-        "En el cuaderno el paraboloide quedó como $\\frac{x^2}{a} + \\frac{y^2}{b}$; la forma usual lleva $a^2$ y $b^2$.",
-        "En el dibujo del cuaderno, 3⁺ y 3⁻ son los dos signos de $c$."
+        "Cortes horizontales ($z$ constante): elipses. Cortes verticales: parábolas. De ahí el nombre.",
+        "3⁺: $c > 0$ · 3⁻: $c < 0$."
       ]
     },
     {
@@ -293,7 +292,7 @@
           "debajo": "Es el paraboloide que abre hacia abajo, subido 7 unidades: su vértice está en $(0, 0, 7)$."
         }
       ],
-      "nota": "El cuaderno no llegó a la conclusión: $z = 7 - x^2 - y^2$ es $z = -x^2 - y^2$ desplazado 7 hacia arriba. Corta el plano $z = 0$ en el círculo $x^2 + y^2 = 7$."
+      "nota": "$z = 7 - x^2 - y^2$ es $z = -x^2 - y^2$ desplazado 7 hacia arriba: vértice en $(0, 0, 7)$. Corta el plano $z = 0$ en el círculo $x^2 + y^2 = 7$."
     },
     {
       "tipo": "texto",
@@ -324,7 +323,7 @@
           "debajo": "Paraboloide alrededor del eje $y$: abre hacia las $y$ positivas."
         }
       ],
-      "nota": "En el cuaderno, $y = x^2 + z^2$ quedó dibujado casi como un cono: es un paraboloide (su borde es curvo, no recto)."
+      "nota": "Paraboloide o cono: el paraboloide tiene los lados curvos; el cono, rectos."
     },
     {
       "tipo": "texto",
@@ -365,7 +364,7 @@
         {
           "src": "books/cya-3-rosales/img/plano-normal.svg",
           "pie": "Plano y normal $\\vec{n}$",
-          "debajo": "Los coeficientes $(a, b, c)$ forman el vector normal: es perpendicular al plano. En el cuaderno se dibujó como $\\vec{v}$."
+          "debajo": "Los coeficientes $(a, b, c)$ forman el vector normal: es perpendicular al plano."
         }
       ],
       "nota": "Forma rápida: con un punto $(x_0, y_0, z_0)$ y la normal $(a, b, c)$, el plano es $a(x - x_0) + b(y - y_0) + c(z - z_0) = 0$."
@@ -393,7 +392,7 @@
       "titulo": "Producto cruz",
       "contenido": ":::lapiz\n$$\\overrightarrow{PQ} = (u, v, w), \\quad \\overrightarrow{PR} = (\\tilde{u}, \\tilde{v}, \\tilde{w})$$\n$$\\overrightarrow{PQ} \\times \\overrightarrow{PR} = \\begin{vmatrix} \\hat{\\imath} & \\hat{\\jmath} & \\hat{k} \\\\ u & v & w \\\\ \\tilde{u} & \\tilde{v} & \\tilde{w} \\end{vmatrix}$$\n\n$\\therefore$ Plano: $x + y + z = 0$\n:::",
       "nota": [
-        "Los números que faltan: $\\overrightarrow{PQ} = (-1, 2, -1)$, $\\overrightarrow{PR} = (-2, 1, 1)$ y $\\overrightarrow{PQ} \\times \\overrightarrow{PR} = (3, 3, 3)$.",
+        "Cálculo: $\\overrightarrow{PQ} = (-1, 2, -1)$, $\\overrightarrow{PR} = (-2, 1, 1)$ y $\\overrightarrow{PQ} \\times \\overrightarrow{PR} = (3, 3, 3)$.",
         "Con $P$: $3(x - 1) + 3(y + 1) + 3z = 0 \\Rightarrow x + y + z = 0$. ✓"
       ]
     }

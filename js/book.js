@@ -252,16 +252,33 @@ export class BookViewer {
     this.opts.onPageChange?.(this.page);
   }
 
-  /** Achica las fórmulas centradas que no caben a lo ancho de la hoja (hasta un 60 %). */
+  /**
+   * Fórmulas que no caben:
+   *  - una fórmula dentro del texto que se partiría en dos renglones pasa entera a su propia línea, centrada;
+   *  - una fórmula centrada más ancha que la hoja se achica lo justo (como mucho hasta el 60 %).
+   */
   fitMath() {
     if (this.destroyed) return;
+    const anchoReal = (box) => {
+      const partes = [...box.querySelectorAll('.katex-html > .base, .math-raw')].map((e) => e.getBoundingClientRect());
+      return partes.length ? Math.max(...partes.map((r) => r.right)) - Math.min(...partes.map((r) => r.left)) : 0;
+    };
+    const enLinea = [...this.el.querySelectorAll('.page-content .katex')].filter((k) => !k.closest('.math-display, .postit-debajo, .postit'));
+    enLinea.forEach((k) => { k.classList.remove('math-linea'); k.style.fontSize = ''; });
+    for (const k of enLinea) {
+      // En un solo renglón los trozos van de izquierda a derecha; si uno vuelve atrás, la fórmula se partió
+      const trozos = [...k.querySelectorAll('.katex-html > .base')].map((e) => e.getBoundingClientRect()).filter((r) => r.width);
+      if (!trozos.some((r, i) => i && r.left < trozos[i - 1].left - 1)) continue; // cabe (o la hoja está oculta)
+      k.classList.add('math-linea');
+      const caja = k.clientWidth, ancho = anchoReal(k);
+      if (caja && ancho > caja) k.style.fontSize = `${Math.max(0.6, (caja / ancho) * 0.97).toFixed(3)}em`;
+    }
     for (const m of this.el.querySelectorAll('.math-display')) {
       if (!m.clientWidth) continue;                       // hoja oculta: se ajusta cuando se vea
       m.style.fontSize = '';
-      // Ancho real de la fórmula: KaTeX deja que su contenido se salga de la caja sin cambiar scrollWidth
-      const partes = [...m.querySelectorAll('.katex-html > .base, .math-raw')].map((e) => e.getBoundingClientRect());
-      if (!partes.length) continue;
-      const ancho = Math.max(...partes.map((r) => r.right)) - Math.min(...partes.map((r) => r.left));
+      // Ancho real: KaTeX deja que su contenido se salga de la caja sin cambiar scrollWidth
+      const ancho = anchoReal(m);
+      if (!ancho) continue;
       const ratio = m.clientWidth / ancho;
       if (ratio < 1) m.style.fontSize = `${Math.max(0.6, ratio * 0.97).toFixed(3)}em`;
     }

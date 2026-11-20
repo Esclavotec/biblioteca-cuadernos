@@ -85,3 +85,21 @@ test('post-its: el dibujo se puede levantar y se escapa todo', () => {
   const malo = pageInnerHtml({ tipo: 'texto', contenido: 'x', dibujos: [{ src: 'javascript:alert(1)' }] });
   assert.ok(!malo.includes('javascript:'));
 });
+
+test('todos los archivos propios usan la misma versión (?v=) para saltarse la caché', async () => {
+  const { readFileSync, readdirSync } = await import('node:fs');
+  const files = ['index.html', ...readdirSync('js').filter((f) => f.endsWith('.js')).map((f) => `js/${f}`)];
+  const vistos = new Set();
+  for (const f of files) {
+    const src = readFileSync(f, 'utf8');
+    for (const m of src.matchAll(/from '\.\/[\w-]+\.js(\?v=[\w.]+)?'/g)) {
+      assert.ok(m[1], `${f}: import sin ?v= → ${m[0]}`);
+      vistos.add(m[1]);
+    }
+    for (const m of src.matchAll(/(?:href|src)="((?:css|js)\/[\w-]+\.(?:css|js))(\?v=[\w.]+)?"/g)) {
+      assert.ok(m[2], `${f}: ${m[1]} sin ?v=`);
+      vistos.add(m[2]);
+    }
+  }
+  assert.equal(vistos.size, 1, `hay versiones distintas: ${[...vistos].join(', ')}`);
+});

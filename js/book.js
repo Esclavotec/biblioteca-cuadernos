@@ -13,8 +13,8 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js';
-import { escapeHtml as esc, contrastText, safeSrc } from './util.js';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.3.1';
+import { escapeHtml as esc, contrastText, safeSrc } from './util.js?v=1.3.1';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -185,11 +185,15 @@ npm start      # servidor local en http://localhost:5173
 npm test       # valida cuadernos + lógica (markdown seguro, firmas, imágenes)
 ```
 
+**Caché.** GitHub Pages deja los archivos en caché unos 10 minutos, y el navegador puede seguir usando el JavaScript viejo con los cuadernos nuevos. Por eso todos los `.js` y el `.css` propios se piden con `?v=<versión>` (en `index.html` y en cada `import`). **Al cambiar código, sube ese número en todos a la vez.** Un test comprueba que sea el mismo en todos los archivos.
+
 Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (rama `main`, carpeta raíz). El archivo `.nojekyll` evita que GitHub procese los archivos.
 
 ---
 
 ## Historial de cambios
+
+- **v1.3.1 (2026-11-20).** Los archivos propios llevan `?v=1.3.1` para que el navegador no mezcle código viejo con cuadernos nuevos (se veían `:::azul` y `$…$` sin formato).
 
 - **v1.3 (2026-11-20). Primer cuaderno real: Cálculo y Análisis III (Prof. Rosales).**
   - 38 páginas con la materia del I parcial: ℝⁿ, norma, Cauchy-Schwarz, desigualdad triangular, producto interno, rectas, esferas, proyección estereográfica, cilindros, cuádricas, curvas y planos.

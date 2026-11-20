@@ -6,7 +6,7 @@
  *
  * validarFirma() aplica los mismos límites que firestore.rules, para avisar antes de enviar.
  */
-import { firebaseConfig } from './firebase-config.js';
+import { firebaseConfig } from './firebase-config.js?v=1.3.1';
 
 const SDK = 'https://www.gstatic.com/firebasejs/11.0.2';
 const LOCAL_KEY = 'biblioteca.firmas.v1';

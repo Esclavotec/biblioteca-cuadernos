@@ -6,9 +6,9 @@
  *   #/libro/<id>[/<pág>]   → abre books/<id>.json en esa página
  *   #/visitas[/<pág>]      → cuaderno de visitas
  */
-import { BookViewer } from './book.js';
-import { Guestbook } from './guestbook.js';
-import { escapeHtml as esc, contrastText, hashString, toast } from './util.js';
+import { BookViewer } from './book.js?v=1.3.1';
+import { Guestbook } from './guestbook.js?v=1.3.1';
+import { escapeHtml as esc, contrastText, hashString, toast } from './util.js?v=1.3.1';
 
 const $ = (sel) => document.querySelector(sel);
 const ID_RE = /^[a-z0-9][a-z0-9-]*$/;

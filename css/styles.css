@@ -326,6 +326,13 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 .math-raw { font-family: var(--mono); font-size: .84em; }
 /* Fórmula del texto que no cabía en el renglón: va entera en la línea siguiente, centrada */
 .page-content .katex.math-linea { display: block; text-align: center; white-space: nowrap; margin: calc(var(--lh) * .12) 0; }
+/* En listas y notas la fórmula baja de línea pero sigue alineada a la izquierda, como los demás ítems */
+.page-content li .katex.math-linea, .page-content .nota .katex.math-linea { text-align: left; }
+.nota p, .nota ul, .nota ol { margin: 0; line-height: inherit; }
+.nota p + p, .nota p + ol, .nota p + ul { margin-top: .3em; }
+.nota ol, .nota ul { padding-left: 1.25em; }
+.nota li + li { margin-top: .12em; }
+.nota li::marker { color: inherit; }
 .nota .katex { font-size: .78em; }
 
 /* Dibujos como post-its: sujetos arriba, se levantan para ver lo de debajo */

@@ -18,7 +18,7 @@
  * Todo el texto se escapa ANTES de aplicar formato, así que nunca se inserta HTML del autor.
  * KaTeX se usa con trust:false, así que tampoco puede generar enlaces ni HTML arbitrario.
  */
-import { escapeHtml } from './util.js?v=1.3.2';
+import { escapeHtml } from './util.js?v=1.3.3';
 
 export const TINTAS = ['rojo', 'azul', 'negro', 'lapiz'];
 

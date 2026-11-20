@@ -99,7 +99,7 @@ flowchart LR
 | `lista` | `titulo`?, `items[]` | Comandos, pasos, ideas (con ✓) |
 | `imagen` | `src`, `titulo`?, `pie`? | Fotos o esquemas del material |
 
-Cualquier página acepta `"nota"` (un texto o una lista de textos), que se muestra como una nota adhesiva amarilla.
+Cualquier página acepta `"nota"` (un texto o una lista de textos), que se muestra como una nota adhesiva amarilla. Dentro de una nota se pueden usar listas (`- ` o `1. `) y párrafos separados por una línea en blanco.
 
 **Dibujos como post-its** (`dibujos`, en cualquier página): cada dibujo se pega como un post-it de color sujeto por arriba. Al tocarlo se levanta sin despegarse y deja ver lo que hay escrito debajo.
 
@@ -120,7 +120,7 @@ Campos opcionales: `alt` (texto para lectores de pantalla) y `color` (`amarillo`
 
 **Fórmulas** con [KaTeX](https://katex.org): `$x^2$` dentro de la línea y `$$\sum x_i$$` en una línea propia para una fórmula centrada. Una fórmula del texto nunca se parte en dos renglones: si no cabe, pasa entera a la línea siguiente, centrada. Una fórmula centrada demasiado ancha se reparte en varias líneas con `\begin{aligned}`; como último recurso se achica un poco (hasta el 60 %). Si el CDN de KaTeX no carga, se ve el código TeX.
 
-**Papel** (`papel`): `rayado` (por defecto), `cuadriculado` o `blanco`.
+**Papel** (`papel`): `blanco` (por defecto), `rayado` o `cuadriculado`. Los cuadernos usan hoja blanca: con fórmulas y dibujos de distintas alturas, los renglones quedaban desalineados.
 
 **Color de tapa** (`color`): usa tonos apagados para que la mesa se vea armónica. Algunos que combinan: `#2f5d50` (verde), `#33507a` (azul), `#3b3f3d` (grafito), `#6b4f7a` (ciruela) y `#8a5a2b` (tabaco).
 
@@ -192,6 +192,11 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.3.3 (2026-11-20). Hojas blancas y notas con listas.**
+  - Todos los cuadernos pasan a hoja blanca, que ahora es el papel por defecto.
+  - Las notas admiten listas y párrafos: las 8 propiedades de ℝⁿ van numeradas, una por línea.
+  - En listas y notas, una fórmula que baja de línea queda alineada a la izquierda como el resto. Si aun así no cabe, se achica a partir de su tamaño real.
 
 - **v1.3.2 (2026-11-20). Sin parpadeo al pasar la hoja en el celular.**
   - Los post-its en reposo ya no usan transformaciones 3D (las sacaban a otra capa y se veían por encima de la hoja que gira). Solo se vuelven 3D mientras están levantados, y se bajan solos al empezar a pasar la hoja.

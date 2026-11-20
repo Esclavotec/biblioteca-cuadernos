@@ -103,3 +103,8 @@ test('todos los archivos propios usan la misma versión (?v=) para saltarse la c
   }
   assert.equal(vistos.size, 1, `hay versiones distintas: ${[...vistos].join(', ')}`);
 });
+
+test('las notas admiten listas', () => {
+  const html = pageInnerHtml({ tipo: 'texto', contenido: 'x', nota: 'Propiedades:\n1. uno\n2. dos' });
+  assert.match(html, /<aside class="nota"><p>Propiedades:<\/p><ol><li>uno<\/li><li>dos<\/li><\/ol><\/aside>/);
+});

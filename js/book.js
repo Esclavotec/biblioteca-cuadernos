@@ -13,8 +13,8 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js?v=1.3.2';
-import { escapeHtml as esc, contrastText, safeSrc } from './util.js?v=1.3.2';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.3.3';
+import { escapeHtml as esc, contrastText, safeSrc } from './util.js?v=1.3.3';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -71,7 +71,7 @@ export function pageInnerHtml(p) {
   }
   if (Array.isArray(p.dibujos) && p.dibujos.length) html += postits(p.dibujos);
   const notas = Array.isArray(p.nota) ? p.nota : p.nota ? [p.nota] : [];
-  notas.forEach((n) => { html += `<aside class="nota">${renderInline(n)}</aside>`; });
+  notas.forEach((n) => { html += `<aside class="nota">${renderMarkdown(n)}</aside>`; }); // admite listas
   return html;
 }
 
@@ -104,7 +104,7 @@ export class BookViewer {
     this.book = book;
     this.opts = opts;
     this.content = Array.isArray(book.paginas) ? book.paginas : [];
-    this.papel = PAPELES.includes(book.papel) ? book.papel : 'rayado';
+    this.papel = PAPELES.includes(book.papel) ? book.papel : 'blanco';
     this.destroyed = false;
     const len = this.content.length;
     this.page = Math.max(0, Math.min(len + 1, opts.startPage | 0));
@@ -281,8 +281,16 @@ export class BookViewer {
       const trozos = [...k.querySelectorAll('.katex-html > .base')].map((e) => e.getBoundingClientRect()).filter((r) => r.width);
       if (!trozos.some((r, i) => i && r.left < trozos[i - 1].left - 1)) continue; // cabe (o la hoja está oculta)
       k.classList.add('math-linea');
-      const caja = k.clientWidth, ancho = anchoReal(k);
-      if (caja && ancho > caja) k.style.fontSize = `${Math.max(0.6, (caja / ancho) * 0.97).toFixed(3)}em`;
+    }
+    // Si aun sola en su línea no cabe a lo ancho del párrafo, se achica lo justo
+    for (const k of enLinea) {
+      const bloque = k.closest('p, li, .nota');
+      if (!bloque || !k.getClientRects().length) continue;
+      const cs = getComputedStyle(bloque);
+      const caja = bloque.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const ancho = anchoReal(k);
+      // Se escala desde el tamaño actual (las notas ya usan fórmulas más chicas)
+      if (caja > 0 && ancho > caja) k.style.fontSize = `${(parseFloat(getComputedStyle(k).fontSize) * Math.max(0.6, (caja / ancho) * 0.97)).toFixed(2)}px`;
     }
     for (const m of this.el.querySelectorAll('.math-display')) {
       if (!m.clientWidth) continue;                       // hoja oculta: se ajusta cuando se vea

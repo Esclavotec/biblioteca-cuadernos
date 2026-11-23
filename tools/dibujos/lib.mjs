@@ -188,9 +188,13 @@ export function esfera(cam, centro, radio, { ecuador = true, op = {} } = {}) {
 /* ---------------------------- Documento ---------------------------- */
 
 /** Envuelve el dibujo en un SVG con un filtro que imita el grano del lápiz. */
-export function svg(w, h, cuerpo, titulo = '') {
+/** Patrón de rayas para sombrear regiones: fill="url(#rayas)" (o rayas-rojo, rayas-cruz). */
+export const RAYAS = `<pattern id="rayas" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#8a8d90" stroke-width="1.3"/></pattern>` +
+  `<pattern id="rayas-rojo" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(-45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#c0322a" stroke-width="1.2" opacity=".7"/></pattern>`;
+
+export function svg(w, h, cuerpo, titulo = '', defs = RAYAS) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" font-family="Georgia, 'Times New Roman', serif">
-${titulo ? `<title>${escXml(titulo)}</title>\n` : ''}<defs><filter id="lapiz" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.7" xChannelSelector="R" yChannelSelector="G"/></filter></defs>
+${titulo ? `<title>${escXml(titulo)}</title>\n` : ''}<defs><filter id="lapiz" x="-3%" y="-3%" width="106%" height="106%"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.7" xChannelSelector="R" yChannelSelector="G"/></filter>${defs}</defs>
 <g filter="url(#lapiz)">
 ${cuerpo}
 </g>

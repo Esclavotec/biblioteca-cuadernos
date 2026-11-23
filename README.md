@@ -26,7 +26,7 @@ Al acercar el mouse a una esquina, la hoja se levanta un poco para indicar que s
 
 **Índice.** Cada cuaderno tiene, después de la portadilla, hojas de índice generadas solas con el título de cada página (13 temas por hoja). No hay que escribirlo en el JSON: si se agregan páginas, el índice se actualiza.
 
-**PDF.** El botón PDF arma el cuaderno completo en hojas A4 (una por página del cuaderno, con los mismos números) y abre el diálogo de impresión. El texto, las fórmulas y los dibujos quedan como vectores, y cada post-it lleva debajo lo que se lee al levantarlo.
+**PDF.** El botón PDF arma el cuaderno completo en A4 y abre el diálogo de impresión. Para no desperdiciar papel, la portada y el índice (a dos columnas) van en hojas propias, y los temas siguen uno tras otro. Cada tema lleva arriba a la derecha su número de página del cuaderno («p. 12»), que es el que usa el índice. El texto, las fórmulas y los dibujos quedan como vectores, y cada post-it lleva debajo lo que se lee al levantarlo.
 
 Cada página tiene un número abajo. La URL también lo guarda (`#/libro/ejemplo-git/4`), así que para pedir una corrección basta con decir *"libro X, página N"*.
 
@@ -198,6 +198,10 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.3.5 (2026-11-23). Más materia del I parcial y PDF compacto.**
+  - CyA III pasa de 38 a 82 páginas: planos, ecuación de cilindros y conos, parametrización de curvas, velocidad y aceleración, triedro de Frenet, curvatura y torsión, superficies de revolución (globo de Monge), campos escalares y topología en ℝⁿ (bolas, abiertos, interior, cerrados, frontera). Son 20 dibujos nuevos.
+  - El PDF ya no usa una hoja por página: los temas van seguidos con su «p. N», y el índice va a dos columnas. Con las 82 páginas sale en 44 hojas en vez de unas 88.
 
 - **v1.3.4 (2026-11-23). Índice y PDF.**
   - Hojas de índice automáticas después de la portadilla; cada tema lleva a su página. Botón **Índice** en la barra.

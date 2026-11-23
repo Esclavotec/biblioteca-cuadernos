@@ -519,11 +519,19 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
   position: fixed; left: -10000px; top: 0; width: 182mm; pointer-events: none;
   background: #fff; color: var(--paper-ink); font-family: var(--font);
 }
-.print-page { --lh: 8.2mm; position: relative; font-size: calc(var(--lh) * .56); line-height: var(--lh); padding-bottom: 4mm; break-after: page; }
-.print-page:last-child { break-after: auto; }
+.print-page { --lh: 7.6mm; position: relative; font-size: calc(var(--lh) * .56); line-height: var(--lh); }
+.print-page.portada, .print-page.print-indice { break-after: page; }
+.print-page.flujo { padding: 3mm 0 5mm; border-top: 1px solid rgba(28, 31, 29, .12); }
+.print-page.flujo:first-of-type, .print-indice + .flujo { border-top: 0; }
+.print-num { float: right; margin-top: .3em; font-size: .64em; line-height: 1.2; color: var(--paper-ink-2); }
+.print-page h2, .print-page h3 { break-after: avoid; }
+.print-aviso { margin-top: 4mm !important; font-size: .7em; color: var(--paper-ink-2); }
+.print-page .postits { justify-content: flex-start; gap: 4mm 4%; }
+.print-page .postit-slot { width: 30%; }
+.print-page .postits.solo .postit-slot { width: 42%; }
+.print-page .nota { width: 70%; }
 .print-page .page-content { position: static; inset: auto; padding: 0; overflow: visible; }
 .print-page .pc-titulo { min-height: 230mm; }
-.print-head { display: flex; justify-content: space-between; margin-bottom: 4mm; padding-bottom: 1.5mm; font-size: .68em; line-height: 1.2; color: var(--paper-ink-2); border-bottom: 1px solid rgba(28, 31, 29, .15); }
 .print-page .page-content h2 { white-space: normal; height: auto; }
 .print-page .postits, .print-page .postit-slot, .print-page .nota, .print-page .math-display { break-inside: avoid; }
 .print-page .postit-slot { display: flex; flex-direction: column; }
@@ -533,10 +541,12 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 .print-page .indice .puntos { transform: none; }
 
 @media print {
-  @page { size: A4; margin: 14mm 14mm 16mm; }
+  @page { size: A4; margin: 14mm 14mm 16mm; @bottom-right { content: counter(page); font: 9pt sans-serif; color: #888; } }
   html, body { background: #fff !important; overflow: visible !important; height: auto !important; }
   body::before, .viewer::before, .desk-view, #toasts, .viewer > :not(.print-book) { display: none !important; }
   .viewer { position: static; display: block; background: #fff; animation: none; }
   .print-book { position: static; left: auto; width: auto; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+.print-indice .indice { columns: 2; column-gap: 9mm; font-size: .86em; }
+.print-indice .indice li { break-inside: avoid; }

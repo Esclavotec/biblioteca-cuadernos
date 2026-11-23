@@ -13,8 +13,8 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js?v=1.3.4';
-import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.3.4';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.3.5';
+import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.3.5';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -414,11 +414,21 @@ export class BookViewer {
     const pb = document.createElement('div');
     pb.className = 'print-book';
     pb.setAttribute('aria-hidden', 'true');
-    const cabeza = (n) => `<header class="print-head"><span>${esc(b.titulo)}</span><span>${n}</span></header>`;
-    const portada = this.content[0]?.tipo === 'titulo' ? '' :
-      `<section class="print-page"><div class="page-content">${pageInnerHtml({ tipo: 'titulo', titulo: b.titulo, subtitulo: [b.curso, b.subtitulo].filter(Boolean).join(' · ') })}</div></section>`;
-    pb.innerHTML = portada + this.content.map((p, i) =>
-      `<section class="print-page">${i ? cabeza(i + 1) : ''}<div class="page-content">${pageInnerHtml(p)}</div></section>`).join('');
+    // PDF compacto: portada e índice en hojas propias; los temas van seguidos, cada uno con su
+    // número de página del cuaderno («p. N»), que es el que usa el índice.
+    const seccion = (cls, inner, num) => `<section class="print-page ${cls}">${num ? `<span class="print-num">p. ${num}</span>` : ''}<div class="page-content">${inner}</div></section>`;
+    const indices = this.content.filter((p) => p.tipo === 'indice');
+    let html = this.content[0]?.tipo === 'titulo' ? seccion('portada', pageInnerHtml(this.content[0])) :
+      seccion('portada', pageInnerHtml({ tipo: 'titulo', titulo: b.titulo, subtitulo: [b.curso, b.subtitulo].filter(Boolean).join(' · ') }));
+    if (indices.length) {
+      html += seccion('print-indice', pageInnerHtml({ tipo: 'indice', titulo: 'Índice', entradas: indices.flatMap((p) => p.entradas || []) }) +
+        `<p class="print-aviso">Los números son las páginas del cuaderno: cada tema lleva su «p.» arriba a la derecha.</p>`);
+    }
+    this.content.forEach((p, i) => {
+      if (p.tipo === 'indice' || (i === 0 && p.tipo === 'titulo')) return;
+      html += seccion('flujo', pageInnerHtml(p), i + 1);
+    });
+    pb.innerHTML = html;
     this.el.appendChild(pb);
     try { toast('Preparando el PDF…'); } catch { /* sin toasts */ }
     // Espera fuentes y dibujos para que el PDF salga completo, y ajusta las fórmulas al ancho del papel

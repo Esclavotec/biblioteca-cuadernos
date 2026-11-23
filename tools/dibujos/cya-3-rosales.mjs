@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   LAPIZ, ROJO, AZUL, SUAVE, camara, linea, flecha, punta, punto, texto, vec, circulo,
-  linea3, flecha3, punto3, curva3, eje, ejes, revolucion, esfera, svg, add, mul,
+  linea3, flecha3, punto3, curva3, eje, ejes, revolucion, esfera, svg, add, mul, sub,
 } from './lib.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
@@ -348,6 +348,250 @@ D['plano-pqr'] = svg(300, 250, (() => {
     vec(add(cam.p([0.9, 0.9, 0.9]), [6, -2]), 'n', { c: ROJO }) +
     texto([10, 242], 'x + y + z = 0', { size: 13 });
 })(), 'Plano por P, Q y R con normal PQ × PR');
+
+/* ======================= I parcial, segunda parte ======================= */
+
+const VERDE = '#2f7a4f';
+const rect2 = (x, y, w, h, op = {}) => linea([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], { cerrar: true, ...op });
+
+D['planos-coordenados'] = svg(300, 230, (() => {
+  const cam = camara({ s: 52, cx: 130, cy: 150 });
+  const L = 1.6;
+  const cara = (pts, fill) => linea3(cam, pts, { cerrar: true, w: 1, fill, op: .9 });
+  return cara([[0, 0, 0], [L, 0, 0], [L, L, 0], [0, L, 0]], 'rgba(44,61,156,.10)') +
+    cara([[0, 0, 0], [L, 0, 0], [L, 0, L], [0, 0, L]], 'rgba(192,50,42,.10)') +
+    cara([[0, 0, 0], [0, L, 0], [0, L, L], [0, 0, L]], 'rgba(47,122,79,.12)') +
+    ejes(cam, { x: [0, 2.3], y: [0, 2.4], z: [0, 2.2] }) +
+    texto(cam.p([0.9, 0.9, 0]), 'z = 0', { size: 13, c: AZUL, anchor: 'middle' }) +
+    texto(cam.p([0.9, 0, 1.0]), 'y = 0', { size: 13, c: ROJO, anchor: 'middle' }) +
+    texto(cam.p([0, 0.85, 1.0]), 'x = 0', { size: 13, c: VERDE, anchor: 'middle' });
+})(), 'Los tres planos coordenados: z = 0, y = 0, x = 0');
+
+D['plano-triangulo'] = svg(280, 230, (() => {
+  const cam = camara({ s: 80, cx: 110, cy: 150 });
+  const A = [1, 0, 0], B = [0, 1, 0], C = [0, 0, 1];
+  return ejes(cam, { x: [0, 1.6], y: [0, 1.8], z: [0, 1.5] }) +
+    linea3(cam, [A, B, C], { cerrar: true, w: 1.6, fill: 'rgba(44,61,156,.12)', c: AZUL }) +
+    punto3(cam, A) + punto3(cam, B) + punto3(cam, C) +
+    texto(add(cam.p(A), [-46, 4]), '(1,0,0)', { size: 12 }) + texto(add(cam.p(B), [2, 18]), '(0,1,0)', { size: 12 }) +
+    texto(add(cam.p(C), [8, -2]), '(0,0,1)', { size: 12 }) +
+    texto([150, 222], 'x + y + z = 1', { size: 13 });
+})(), 'El plano x + y + z = 1 corta los ejes en (1,0,0), (0,1,0) y (0,0,1)');
+
+D['plano-y-z'] = svg(280, 230, (() => {
+  const cam = camara({ s: 52, cx: 120, cy: 150 });
+  const L = 1.7;
+  return ejes(cam, { x: [0, 2.3], y: [0, 2.4], z: [0, 2.3] }) +
+    linea3(cam, [[0, 0, 0], [L, 0, 0], [L, L, L], [0, L, L]], { cerrar: true, w: 1.5, fill: 'rgba(44,61,156,.12)', c: AZUL }) +
+    linea3(cam, [[0, L, 0], [0, L, L]], { dash: true, c: SUAVE }) +
+    linea3(cam, [[L, L, 0], [L, L, L]], { dash: true, c: SUAVE }) +
+    texto(add(cam.p([0, L, L]), [8, 0]), 'y = z', { size: 13, c: AZUL });
+})(), 'El plano y = z contiene al eje x');
+
+D['cilindro-esfera-plano'] = svg(320, 250, (() => {
+  const cam = camara({ s: 32, cx: 150, cy: 128, el: 18 });
+  const R = Math.sqrt(8);
+  const u = [1 / Math.SQRT2, -1 / Math.SQRT2, 0], w = [1 / Math.sqrt(6), 1 / Math.sqrt(6), -2 / Math.sqrt(6)];
+  const circ = (t) => add(mul(u, R * Math.cos(t)), mul(w, R * Math.sin(t)));
+  const v = [0, 1, 1];
+  let out = esfera(cam, [0, 0, 0], R, { ecuador: false, op: { w: 1.3, c: SUAVE } });
+  for (let i = 0; i < 12; i++) { const q = circ(i * Math.PI / 6); out += linea3(cam, [add(q, mul(v, -1.6)), add(q, mul(v, 1.6))], { c: AZUL, w: 1.1, op: .8 }); }
+  out += curva3(cam, circ, 0, 2 * Math.PI, { c: ROJO, w: 2.2 });
+  const q0 = circ(0.6);
+  out += flecha3(cam, q0, add(q0, mul(v, 1.2)), { c: AZUL, w: 2.2 }) + punto3(cam, q0, { c: ROJO });
+  out += vec(add(cam.p(add(q0, mul(v, 1.2))), [4, -4]), 'v', { c: AZUL });
+  return out + texto([10, 242], 'directriz: esfera ∩ plano · generatrices ∥ (0, 1, 1)', { size: 12 });
+})(), 'Cilindro con directriz el círculo esfera ∩ plano y generatrices paralelas a (0, 1, 1)');
+
+D['cono-general'] = svg(280, 230, (() => {
+  const P = [140, 30];
+  const curva = [];
+  for (let i = 0; i <= 80; i++) { const t = i / 80 * 2 * Math.PI; curva.push([140 + 95 * Math.cos(t) + 12 * Math.cos(3 * t), 175 + 30 * Math.sin(t) + 6 * Math.sin(2 * t)]); }
+  let out = linea(curva, { c: AZUL, w: 2 });
+  for (let i = 0; i < 80; i += 8) out += linea([P, curva[i]], { w: 1.1, dash: curva[i][1] < 175 ? true : false, c: curva[i][1] < 175 ? SUAVE : LAPIZ });
+  const q = curva[12];
+  out += linea([P, q], { c: ROJO, w: 1.8 }) + punto(P) + punto(q, { c: ROJO });
+  return out + texto([P[0] + 8, P[1] - 4], 'P = (a, b, c)', { size: 13 }) + texto(add(q, [6, 16]), '(x₀, y₀, z₀)', { size: 12, c: ROJO }) +
+    texto([18, 222], 'curva 𝒞', { size: 13, c: AZUL });
+})(), 'Cono: rectas desde el vértice P hasta cada punto de la curva');
+
+D['cono-vertice'] = svg(280, 250, (() => {
+  const cam = camara({ s: 62, cx: 130, cy: 180, el: 20 });
+  const sup = revolucion(cam, { r: (t) => t });
+  const L = 1.6;
+  return eje(cam, 'x', 0, 2.0) + eje(cam, 'y', 0, 2.2) +
+    linea3(cam, [[L, -L, 1], [L, L, 1], [-L, L, 1], [-L, -L, 1]], { cerrar: true, w: 1.1, c: SUAVE }) +
+    sup.contorno(0.01, 1.0) + sup.aro(1.0, 'frente', { c: ROJO, w: 2.2 }) +
+    eje(cam, 'z', 0, 2.1, { ocultos: [[0, 1]] }) + punto3(cam, [0, 0, 0]) +
+    texto(add(cam.p([0, 0, 0]), [8, 14]), 'P = (0,0,0)', { size: 12 }) +
+    texto(add(cam.p([-L, L, 1]), [-30, 14]), 'z = 1', { size: 12 }) +
+    texto(add(cam.p([0, 1, 1]), [10, 16]), 'x² + y² = 1', { size: 12, c: ROJO });
+})(), 'Cono con vértice en el origen y directriz el círculo x² + y² = 1, z = 1');
+
+D['parametrizacion'] = svg(340, 210, (() => {
+  let out = flecha([14, 150], [120, 150]) + texto([14, 140], 'ℝ', { size: 16, italic: false }) + punto([64, 150]) + texto([60, 170], 't', { size: 14 });
+  const cam = camara({ s: 36, cx: 230, cy: 150 });
+  const hel = (t) => [0.9 * Math.cos(t), 0.9 * Math.sin(t) + 0.6, 0.25 * t];
+  out += ejes(cam, { x: [0, 1.9], y: [0, 2.4], z: [0, 3.2] }) + curva3(cam, hel, 0, 3 * Math.PI, { c: AZUL, w: 2 });
+  const q = cam.p(hel(4.2));
+  out += punto(q, { c: ROJO }) + texto(add(q, [8, -6]), 'α(t)', { size: 14, c: ROJO });
+  const arco = []; for (let i = 0; i <= 20; i++) { const s = i / 20; arco.push([64 + (q[0] - 74) * s, 140 - 70 * Math.sin(Math.PI * s) + (q[1] - 140) * s]); }
+  out += linea(arco, { dash: true, c: SUAVE }) + punta(arco[18], arco[20], { c: SUAVE });
+  return out + texto([70, 50], 'de ℝ a ℝ³', { size: 13 });
+})(), 'Una curva: a cada t de ℝ le toca un punto α(t) de ℝ³');
+
+D['circulo-z2'] = svg(260, 230, (() => {
+  const cam = camara({ s: 52, cx: 120, cy: 175, el: 22 });
+  const c = revolucion(cam, { centro: [0, 0, 2], r: () => 1 });
+  return ejes(cam, { x: [0, 1.9], y: [0, 2.2], z: [0, 2.8] }) +
+    linea3(cam, [[0, 0, 2], [1, 0, 2]], { dash: true, c: SUAVE }) +
+    c.aro(0, 'completo', { c: AZUL, w: 2 }) + punto3(cam, [0, 0, 2], { r: 2.4 }) +
+    texto(add(cam.p([0, 0, 2]), [-18, -6]), '2', { size: 13 }) +
+    texto([130, 28], 'α(θ) = (cos θ, sen θ, 2)', { size: 13 });
+})(), 'Círculo de radio 1 a la altura z = 2');
+
+D['triedro-frenet'] = svg(300, 240, (() => {
+  const cam = camara({ s: 64, cx: 150, cy: 175, el: 24 });
+  const c = revolucion(cam, { centro: [0, 0, 1], r: () => 1 });
+  let out = ejes(cam, { x: [0, 1.9], y: [0, 2.2], z: [0, 2.4] }) + c.aro(0, 'completo', { w: 1.6 });
+  for (const t of [-0.5, 1.2]) {
+    const q = [Math.cos(t), Math.sin(t), 1];
+    const T = [-Math.sin(t), Math.cos(t), 0], N = [-Math.cos(t), -Math.sin(t), 0], B = [0, 0, 1];
+    const k = 0.6;
+    out += flecha3(cam, q, add(q, mul(T, k)), { c: AZUL, w: 2 }) + flecha3(cam, q, add(q, mul(N, k)), { c: ROJO, w: 2 }) + flecha3(cam, q, add(q, mul(B, k)), { c: VERDE, w: 2 }) + punto3(cam, q);
+    out += texto(add(cam.p(add(q, mul(T, k))), [4, -4]), 'T', { size: 13, c: AZUL }) + texto(add(cam.p(add(q, mul(N, k))), [-12, 14]), 'N', { size: 13, c: ROJO }) + texto(add(cam.p(add(q, mul(B, k))), [4, -2]), 'B', { size: 13, c: VERDE });
+  }
+  return out;
+})(), 'Triedro de Frenet: T tangente, N normal (hacia el centro) y B binormal');
+
+D['circulo-inclinado'] = svg(300, 240, (() => {
+  const cam = camara({ s: 120, cx: 150, cy: 125, el: 18 });
+  const r = 1 / Math.SQRT2;
+  const al = (t) => [Math.cos(t) / Math.SQRT2, Math.sin(t) / Math.sqrt(20), 3 * Math.sin(t) / Math.sqrt(20)];
+  const n = 1 / Math.sqrt(10), L = 0.95;
+  const e1 = [1, 0, 0], e2 = [0, n, 3 * n];
+  const esq = [add(mul(e1, L), mul(e2, L)), add(mul(e1, -L), mul(e2, L)), add(mul(e1, -L), mul(e2, -L)), add(mul(e1, L), mul(e2, -L))];
+  return linea3(cam, esq, { cerrar: true, w: 1, c: SUAVE, fill: 'rgba(44,61,156,.07)' }) +
+    ejes(cam, { x: [0, 1.25], y: [0, 1.15], z: [0, 1.1] }) +
+    curva3(cam, al, 0, 2 * Math.PI, { c: ROJO, w: 2.2 }) +
+    linea3(cam, [[0, 0, 0], al(0)], { dash: true }) + punto3(cam, [0, 0, 0], { r: 2.5 }) +
+    texto(add(cam.p(mul(al(0), 0.5)), [8, -8]), 'r = 1/√2', { size: 12 }) +
+    texto(add(cam.p(esq[1]), [-10, -6]), 'z = 3y', { size: 12, c: AZUL });
+})(), 'La curva es un círculo de radio 1/√2 centrado en el origen, dentro del plano z = 3y');
+
+D['globo-monge'] = svg(320, 250, (() => {
+  const cam = camara({ s: 46, cx: 160, cy: 130, el: 18 });
+  const curva = (t) => [0.3 * Math.sin(2 * t), 1.1 + 0.25 * t * t * 0 + 0.35 * Math.cos(t), t];
+  const z0 = 0.3, q = curva(z0), r = Math.hypot(q[0], q[1]);
+  const sph = Math.hypot(q[0], q[1], q[2]);
+  const L = 1.9;
+  const ring = revolucion(cam, { centro: [0, 0, z0], r: () => r });
+  return esfera(cam, [0, 0, 0], sph, { ecuador: false, op: { w: 1.2, c: SUAVE } }) +
+    linea3(cam, [[L, -L, z0], [L, L, z0], [-L, L, z0], [-L, -L, z0]], { cerrar: true, w: 1, c: SUAVE }) +
+    eje(cam, 'z', -2.2, 2.4, { nombre: 'eje' }) +
+    curva3(cam, curva, -1.9, 1.9, { c: AZUL, w: 2 }) +
+    ring.aro(0, 'frente', { c: ROJO, w: 2 }) + punto3(cam, [0, 0, 0], { r: 2.4 }) + punto3(cam, q, { c: ROJO }) +
+    texto(add(cam.p(curva(1.9)), [6, 4]), '𝒞', { size: 15, c: AZUL }) +
+    texto(add(cam.p([0, 0, 0]), [-18, 14]), 'P', { size: 13 }) +
+    texto(add(cam.p([L, -L, z0]), [6, 12]), 'plano de Monge', { size: 12 }) +
+    texto([10, 22], 'esfera de Monge', { size: 12, c: SUAVE }) +
+    texto(add(cam.p(q), [8, -6]), '(x₀, y₀, z₀)', { size: 12, c: ROJO });
+})(), 'Globo de Monge: esfera con centro en el eje y plano perpendicular al eje; se cortan en el círculo que recorre el punto');
+
+D['cono-revolucion'] = svg(260, 250, (() => {
+  const cam = camara({ s: 60, cx: 125, cy: 128, el: 18 });
+  const sup = revolucion(cam, { r: (t) => Math.abs(t) });
+  return sup.contorno(0.02, 1.4, { c: SUAVE }) + sup.contorno(-1.4, -0.02, { c: SUAVE }) + sup.aro(1.4, 'completo', { c: SUAVE }) + sup.aro(-1.4, 'frente', { c: SUAVE }) +
+    eje(cam, 'z', -1.9, 1.9, { ocultos: [[-1.4, 1.4]] }) + eje(cam, 'x', -1.7, 2.1) + eje(cam, 'y', 0, 1.75) +
+    linea3(cam, [[-1.4, 0, -1.4], [1.4, 0, 1.4]], { c: ROJO, w: 2.2 }) +
+    texto(add(cam.p([1.4, 0, 1.4]), [10, 4]), 'z = x, y = 0', { size: 12, c: ROJO }) +
+    texto([10, 242], 'al girar la recta roja: z² = x² + y²', { size: 12 });
+})(), 'La recta z = x (y = 0) gira alrededor del eje z y forma el cono');
+
+D['lema-r2'] = svg(280, 210, (() => {
+  const O = [50, 170], Q = [220, 50];
+  return flecha([20, 170], [262, 170], { c: SUAVE, w: 1.2 }) + flecha([50, 196], [50, 14], { c: SUAVE, w: 1.2 }) +
+    linea([O, Q], { w: 2, c: AZUL }) + linea([[Q[0], 170], Q], { dash: true }) + linea([[50, Q[1]], Q], { dash: true, c: SUAVE }) +
+    punto(Q) + texto([Q[0] + 6, Q[1] - 6], '(x, y)', { size: 13 }) +
+    texto([125, 190], '|x|', { size: 14, anchor: 'middle' }) + texto([Q[0] + 8, 115], '|y|', { size: 14 }) +
+    texto([96, 98], '‖x‖ = √(x² + y²)', { size: 13, c: AZUL, anchor: 'middle' });
+})(), 'Cada cateto es menor o igual que la hipotenusa: |x| ≤ ‖x‖ y |y| ≤ ‖x‖');
+
+D['bola-abierta'] = svg(260, 220, (() => {
+  const cam = camara({ s: 80, cx: 130, cy: 112 });
+  const c = cam.p([0, 0, 0]);
+  return `<circle cx="${c[0]}" cy="${c[1]}" r="80" fill="rgba(44,61,156,.10)"/>` +
+    circulo(c, 80, { dash: '6 5', w: 1.6 }) +
+    revolucion(cam, { r: (t) => Math.sqrt(Math.max(0, 1 - t * t)) }).aro(0, 'frente', { w: 1, dash: '6 5' }) +
+    flecha(c, [c[0] + 56, c[1] - 57], { c: ROJO, w: 1.8 }) + punto(c) +
+    texto([c[0] - 6, c[1] + 18], 'a', { size: 14 }) + texto([c[0] + 26, c[1] - 34], 'ε', { size: 15, c: ROJO }) +
+    texto([10, 212], 'borde punteado: la cáscara no es parte de la bola', { size: 11 });
+})(), 'Bola abierta: los puntos a distancia menor que ε del centro a');
+
+D['bola-r2'] = svg(260, 210, (() => {
+  const c = [160, 80];
+  return flecha([20, 175], [250, 175], { c: SUAVE, w: 1.2 }) + flecha([60, 200], [60, 12], { c: SUAVE, w: 1.2 }) +
+    `<circle cx="${c[0]}" cy="${c[1]}" r="50" fill="rgba(44,61,156,.12)"/>` + circulo(c, 50, { dash: '6 5', w: 1.6 }) +
+    linea([c, [c[0] + 35, c[1] - 35]], { c: ROJO, w: 1.8 }) + punto(c) +
+    texto([c[0] - 4, c[1] + 18], 'a', { size: 14 }) + texto([c[0] + 18, c[1] - 26], 'ε', { size: 15, c: ROJO }) +
+    texto([150, 200], 'B(a; ε) en ℝ²: un disco sin su borde', { size: 11, anchor: 'middle' });
+})(), 'En ℝ² la bola abierta es un disco sin el borde');
+
+D['cuadrante-abierto'] = svg(280, 230, (() => {
+  const O = [50, 190], a = [180, 90], e = 0.55 * Math.min(a[0] - O[0], O[1] - a[1]);
+  return `<rect x="${O[0]}" y="14" width="${266 - O[0]}" height="${O[1] - 14}" fill="url(#rayas)" opacity=".8"/>` +
+    linea([[O[0], O[1]], [270, O[1]]], { dash: true }) + linea([[O[0], O[1]], [O[0], 12]], { dash: true }) +
+    linea([[14, O[1]], O], { c: SUAVE, w: 1.2 }) + linea([O, [O[0], 222]], { c: SUAVE, w: 1.2 }) +
+    `<circle cx="${a[0]}" cy="${a[1]}" r="${e}" fill="#fff" fill-opacity=".75"/>` + circulo(a, e, { dash: '5 4', c: ROJO, w: 1.6 }) +
+    linea([[a[0], a[1]], [a[0], O[1]]], { dash: '3 3', c: SUAVE }) + linea([[O[0], a[1]], a], { dash: '3 3', c: SUAVE }) +
+    punto(a) + texto([a[0] + 6, a[1] - 6], '(a₁, a₂)', { size: 12 }) +
+    texto([a[0] + 5, 150], 'a₂', { size: 12 }) + texto([110, a[1] - 5], 'a₁', { size: 12 }) +
+    texto([a[0] - e + 4, a[1] + 4], 'ε', { size: 13, c: ROJO }) +
+    texto([150, 216], 'x > 0, y > 0 (los ejes no entran)', { size: 11, anchor: 'middle' });
+})(), 'Primer cuadrante abierto: alrededor de cada punto cabe una bola de radio menor que a₁ y a₂');
+
+D['cuadrante-cerrado'] = svg(280, 230, (() => {
+  const O = [120, 150], e = 46;
+  return `<rect x="${O[0]}" y="14" width="${266 - O[0]}" height="${O[1] - 14}" fill="url(#rayas)" opacity=".8"/>` +
+    linea([[14, O[1]], [266, O[1]]], { w: 1.4 }) + linea([[O[0], 222], [O[0], 12]], { w: 1.4 }) +
+    linea([O, [266, O[1]]], { w: 2.4 }) + linea([O, [O[0], 14]], { w: 2.4 }) +
+    circulo(O, e, { dash: '5 4', c: ROJO, w: 1.6 }) + punto(O) +
+    punto([O[0] - e / 2, O[1]], { c: ROJO }) + texto([O[0] - e / 2 - 70, O[1] + 34], '(−ε/2, 0) ∉ A', { size: 12, c: ROJO }) +
+    texto([O[0] + 6, O[1] - 8], '(0,0)', { size: 12 }) +
+    texto([150, 216], 'x ≥ 0, y ≥ 0 (los ejes sí entran)', { size: 11, anchor: 'middle' });
+})(), 'Cuadrante cerrado: toda bola centrada en el origen se sale de A');
+
+D['tres-cuadrantes'] = svg(260, 220, (() => {
+  const O = [130, 110];
+  return `<path d="M14 14 H${O[0]} V${O[1]} H246 V206 H14 Z" fill="url(#rayas)" opacity=".85"/>` +
+    linea([[14, O[1]], [246, O[1]]], { w: 1.8 }) + linea([[O[0], 206], [O[0], 14]], { w: 1.8 }) +
+    texto([188, 66], 'ℝ² − A', { size: 14, anchor: 'middle', c: AZUL }) + texto([188, 86], 'x > 0, y > 0', { size: 11, anchor: 'middle', c: AZUL }) +
+    texto([70, 66], 'A', { size: 16, anchor: 'middle' });
+})(), 'A son tres cuadrantes con sus bordes; su complemento es el primer cuadrante abierto');
+
+D['bola-cerrada'] = svg(280, 230, (() => {
+  const c = [110, 120], R = 55, a = [215, 55];
+  const dist = Math.hypot(a[0] - c[0], a[1] - c[1]);
+  const e = (dist - R) / 2;
+  const borde = [c[0] + (a[0] - c[0]) * R / dist, c[1] + (a[1] - c[1]) * R / dist];
+  return `<rect x="8" y="8" width="264" height="214" fill="url(#rayas-rojo)"/>` +
+    `<circle cx="${c[0]}" cy="${c[1]}" r="${R}" fill="#fff"/><circle cx="${c[0]}" cy="${c[1]}" r="${R}" fill="url(#rayas)"/>` +
+    circulo(c, R, { w: 2 }) + linea([[8, c[1]], [272, c[1]]], { c: SUAVE, w: 1 }) + linea([[c[0], 222], [c[0], 8]], { c: SUAVE, w: 1 }) +
+    `<circle cx="${a[0]}" cy="${a[1]}" r="${e}" fill="#fff"/>` + circulo(a, e, { dash: '4 3', c: AZUL, w: 1.6 }) +
+    linea([borde, a], { c: LAPIZ, w: 1.2, dash: '3 3' }) + punto(a, { c: AZUL }) + punto(c, { r: 2.4 }) +
+    texto([a[0] + 6, a[1] - 8], 'a', { size: 14, c: AZUL }) + texto([(borde[0] + a[0]) / 2 - 18, (borde[1] + a[1]) / 2 + 2], 'd', { size: 13 }) +
+    texto([c[0] - 30, c[1] + 40], 'B[0; 1]', { size: 12 }) + texto([196, 214], 'complemento', { size: 12, c: ROJO });
+})(), 'La bola cerrada y su complemento: alrededor de a cabe una bola de radio (‖a‖ − 1)/2 fuera de B[0; 1]');
+
+D['frontera'] = svg(280, 220, (() => {
+  const x2 = 130, r = 26, P = [x2, 80];
+  return `<rect x="${x2}" y="10" width="${270 - x2}" height="200" fill="url(#rayas)" opacity=".85"/>` +
+    flecha([14, 150], [266, 150], { c: SUAVE, w: 1.2 }) + flecha([40, 206], [40, 12], { c: SUAVE, w: 1.2 }) +
+    linea([[x2, 10], [x2, 210]], { dash: '6 5', c: ROJO, w: 2 }) +
+    circulo(P, r, { dash: '4 3', c: AZUL, w: 1.6 }) + punto(P, { c: ROJO }) +
+    texto([x2 + 6, 166], '2', { size: 13 }) + texto([x2 - 50, 40], 'Fr(A)', { size: 13, c: ROJO }) +
+    texto([210, 120], 'A: x > 2', { size: 13, anchor: 'middle' });
+})(), 'La frontera de x > 2 es la recta x = 2: toda bola con centro ahí toca A y su complemento');
 
 for (const [nombre, contenido] of Object.entries(D)) writeFileSync(path.join(OUT, `${nombre}.svg`), contenido);
 console.log(`${Object.keys(D).length} dibujos en ${path.relative(root, OUT)}`);

@@ -2,7 +2,7 @@
   "id": "cya-3-rosales",
   "titulo": "Cálculo y Análisis III",
   "curso": "Prof. Rosales",
-  "subtitulo": "I parcial · en progreso",
+  "subtitulo": "I parcial completo · en progreso",
   "color": "#6b4f7a",
   "papel": "blanco",
   "tintas": true,
@@ -798,6 +798,146 @@
           "debajo": "Aquí ningún punto de la frontera está en $A$ (porque $x > 2$ es estricto). Si fuera $x \\ge 2$, la frontera sería la misma, pero estaría dentro de $A$."
         }
       ]
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Límites y continuidad en ℝⁿ",
+      "contenido": "$[n = 2;\\ n = 3]$\n\n**Recuerde:** $f : \\mathbb{R} \\to \\mathbb{R}$ tq $\\displaystyle\\lim_{x \\to a} f(x) = L$\n:::azul\n$\\forall\\, \\varepsilon > 0\\ \\exists\\, \\delta > 0$ tq $\\forall x$ con $0 < |x - a| < \\delta$ ent. $|f(x) - L| < \\varepsilon$\n:::\n\n### Teorema\n(No funciona en $n \\ge 2$)\n:::azul\n$$\\lim_{x \\to a^+} f(x) = \\lim_{x \\to a^-} f(x) \\iff \\lim_{x \\to a} f(x) = L$$\n:::\n\n\\* En el espacio hay **infinitas formas y direcciones** para acercarse a un punto.",
+      "nota": "En $\\mathbb{R}$ solo hay dos lados para acercarse a $a$. En el plano hay infinitos caminos, y todos tienen que dar lo mismo para que el límite exista."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Límite en ℝ²",
+      "contenido": "$f : \\mathbb{R}^2 \\to \\mathbb{R}$ {azul|(campos escalares)}\n\n### ¿Qué significa $\\lim_{(x,y) \\to (a,b)} f(x, y) = L$?\n:::azul\n$\\forall\\, \\varepsilon > 0\\ \\exists\\, \\delta > 0$ tq $\\forall (x, y)$ con\n$$0 < \\|(x, y) - (a, b)\\| < \\delta \\Rightarrow |f(x, y) - L| < \\varepsilon$$\n:::",
+      "dibujos": [
+        {
+          "src": "books/cya-3-rosales/img/limite-r2.svg",
+          "pie": "$\\varepsilon$ y $\\delta$",
+          "debajo": "Para cualquier $\\varepsilon$ (lo cerca que quiero estar de $L$) tiene que existir un disco de radio $\\delta$ alrededor de $(a, b)$ que caiga entero dentro de $(L - \\varepsilon, L + \\varepsilon)$."
+        }
+      ],
+      "nota": "El $0 <$ quiere decir que no importa lo que pase justo en $(a, b)$: la función ni siquiera tiene que estar definida ahí."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Ejm: 3x − 2y → 0",
+      "contenido": "### Ejm\n:::lapiz\nPruebe que $\\displaystyle\\lim_{(x,y) \\to (0,0)} (3x - 2y) = 0$\n\nTome $\\varepsilon > 0$ arbitrario. Halle un $\\delta > 0$ tq $\\forall (x, y)$ cumple\n$$\\|\\langle x, y \\rangle - \\langle 0, 0 \\rangle\\| < \\delta \\Rightarrow |3x - 2y - 0| < \\varepsilon$$\n$$\\iff \\sqrt{x^2 + y^2} < \\delta \\Rightarrow |3x - 2y| < \\varepsilon$$\n\n$$\\begin{aligned} |3x - 2y - 0| = |3x - 2y| &\\le 3|x| + 2|y| \\\\ &\\le 3\\sqrt{x^2 + y^2} + 2\\sqrt{x^2 + y^2} \\\\ &= 5\\sqrt{x^2 + y^2} < \\varepsilon \\end{aligned}$$\n$$\\Rightarrow \\sqrt{x^2 + y^2} < \\frac{\\varepsilon}{5}$$\n\nTome $0 < \\delta < \\frac{\\varepsilon}{5}$.\n:::",
+      "nota": "Los dos pasos con $\\le$: desigualdad triangular y el lema $|x| \\le \\sqrt{x^2 + y^2}$."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "3x − 2y → 0: la prueba",
+      "contenido": ":::lapiz\nSea $\\varepsilon > 0$ y $0 < \\delta < \\frac{\\varepsilon}{5}$.\n\nEnt. $\\forall \\langle x, y \\rangle$ tq $0 < \\|\\langle x, y \\rangle - \\langle 0, 0 \\rangle\\| < \\delta$:\n$$\\begin{aligned} |3x - 2y| &\\le 3|x| + 2|y| \\\\ &\\le 5\\sqrt{x^2 + y^2} \\\\ &< 5 \\cdot \\delta \\\\ &< 5 \\cdot \\frac{\\varepsilon}{5} = \\varepsilon \\end{aligned}$$\n:::",
+      "nota": "Así se escriben estas pruebas: primero, en borrador, se busca $\\delta$ (la página anterior); después se escribe limpio, empezando por «sea $\\varepsilon > 0$»."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Ejm: xy → 0",
+      "contenido": "### Ejm\n:::lapiz\nPruebe que $\\displaystyle\\lim_{\\langle x,y \\rangle \\to \\langle 0,0 \\rangle} xy = 0$\n\nTome $\\varepsilon > 0$, halle $\\delta > 0$ tq $\\forall \\langle x, y \\rangle$ con\n$$0 < \\|\\langle x, y \\rangle - \\langle 0, 0 \\rangle\\| < \\delta \\Rightarrow |xy - 0| < \\varepsilon$$\n\nObserve que:\n$$\\begin{aligned} |xy - 0| = |x||y| &\\le \\sqrt{x^2 + y^2} \\cdot \\sqrt{x^2 + y^2} \\\\ &= x^2 + y^2 \\end{aligned}$$\n\n¿Quién es $\\delta$? Queremos $|xy - 0| \\le x^2 + y^2 < \\varepsilon$:\n$$\\sqrt{x^2 + y^2} < \\delta \\Rightarrow x^2 + y^2 < \\delta^2 \\Rightarrow 0 < \\delta^2 < \\varepsilon \\Rightarrow 0 < \\delta < \\sqrt{\\varepsilon}$$\n:::"
+    },
+    {
+      "tipo": "texto",
+      "titulo": "xy → 0: la prueba",
+      "contenido": ":::lapiz\nSea $\\varepsilon > 0$ y $0 < \\delta < \\sqrt{\\varepsilon}$, ya que $\\forall \\langle x, y \\rangle$ con $\\|\\langle x, y \\rangle - \\langle 0, 0 \\rangle\\| < \\delta$ se tiene:\n$$\\begin{aligned} |xy - 0| = |x||y| &\\le \\sqrt{x^2 + y^2} \\cdot \\sqrt{x^2 + y^2} \\\\ &= x^2 + y^2 \\\\ &< \\delta^2 \\\\ &< (\\sqrt{\\varepsilon})^2 = \\varepsilon \\end{aligned}$$\n:::",
+      "nota": "Aquí $\\delta$ depende de $\\varepsilon$ con raíz, porque $xy$ es de grado 2: se va a 0 «más rápido» que $\\|(x, y)\\|$."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Prueba de la NO existencia de un límite",
+      "contenido": ":::azul\n$$\\lim_{\\langle x,y \\rangle \\to \\langle 0,0 \\rangle} \\frac{x^2 - y^2}{x^2 + y^2} \\ \\text{¡no existe!}$$\n:::\n\n**Demostración:** $A = \\{(x, y) : y = 0\\}$, $\\ B = \\{(x, y) : x = 0\\}$\n:::lapiz\n$$\\lim_{\\substack{(x,y) \\to (0,0) \\\\ (x,y) \\in A}} \\frac{x^2 - y^2}{x^2 + y^2} = \\lim_{x \\to 0} \\frac{x^2 - 0}{x^2 + 0} = \\lim_{x \\to 0} 1 = 1$$\n$$\\lim_{\\substack{(x,y) \\to (0,0) \\\\ (x,y) \\in B}} \\frac{x^2 - y^2}{x^2 + y^2} = \\lim_{y \\to 0} \\frac{0^2 - y^2}{0^2 + y^2} = \\lim_{y \\to 0} (-1) = -1$$\n:::",
+      "dibujos": [
+        {
+          "src": "books/cya-3-rosales/img/caminos-ejes.svg",
+          "pie": "Dos caminos, dos resultados",
+          "debajo": "Si dos caminos hacia el punto dan resultados distintos, el límite no existe. Basta con encontrar dos."
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Las rectas no bastan",
+      "contenido": "### Ejm\n:::lapiz\n$$\\lim_{(x,y) \\to (0,0)} \\frac{x^2 y}{x^4 + y^2}$$\n\n$A = \\{(x, y) : y = mx\\}$:\n$$\\lim_{\\substack{(x,y) \\to (0,0) \\\\ (x,y) \\in A}} \\frac{x^2 y}{x^4 + y^2} = \\lim_{x \\to 0} \\frac{x^2(mx)}{x^4 + (mx)^2} = \\lim_{x \\to 0} \\frac{mx}{x^2 + m^2} = 0$$\n\n$x = 0$:\n$$\\lim_{y \\to 0} \\frac{0^2 y}{0^4 + y^2} = \\lim_{y \\to 0} 0 = 0$$\n\nEl límite en cuestión es 0 para cualquier recta que pasa por el origen, **pero el límite no existe**.\n:::",
+      "nota": "Al simplificar por $x^2$: $\\frac{m x^3}{x^4 + m^2x^2} = \\frac{mx}{x^2 + m^2}$."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Por la parábola",
+      "contenido": ":::lapiz\n$B = \\{(x, y) : y = x^2\\}$:\n$$\\lim_{\\substack{(x,y) \\to (0,0) \\\\ (x,y) \\in B}} \\frac{x^2 y}{x^4 + y^2} = \\lim_{x \\to 0} \\frac{x^4}{2x^4} = \\frac{1}{2}$$\n:::",
+      "dibujos": [
+        {
+          "src": "books/cya-3-rosales/img/caminos-parabola.svg",
+          "pie": "Rectas contra parábola",
+          "debajo": "Que todas las rectas den lo mismo no prueba que el límite exista: la parábola $y = x^2$ da $\\frac{1}{2} \\neq 0$."
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Límite en ℝ³",
+      "contenido": "$f : \\mathbb{R}^3 \\to \\mathbb{R}$\n\n### ¿Qué significa que $\\lim_{(x,y,z) \\to (a,b,c)} f(x, y, z) = L$?\n:::azul\n$\\forall\\, \\varepsilon > 0\\ \\exists\\, \\delta > 0$ tq $\\forall (x, y, z)$ con\n$$0 < \\|(x, y, z) - (a, b, c)\\| < \\delta \\Rightarrow |f(x, y, z) - L| < \\varepsilon$$\n:::\n\n### Ejm\n:::lapiz\n$$\\lim_{(x,y,z) \\to (0,0,0)} \\frac{xyz}{x + y + z}$$\n\nSea $A = \\{(x, y, z) : y = z = 0\\}$:\n$$\\lim_{\\substack{(x,y,z) \\to (0,0,0) \\\\ y = z = 0}} \\frac{xyz}{x + y + z} = \\lim_{x \\to 0} \\frac{x \\cdot 0 \\cdot 0}{x + 0 + 0} = \\lim_{x \\to 0} \\frac{0}{x} = 0$$\n:::"
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Límite en ℝ³: otro camino",
+      "contenido": ":::lapiz\nConsidere $B = \\{(x, y, z) : y = x,\\ z = x^3 - 2x\\}$:\n$$\\begin{aligned} \\lim_{\\substack{(x,y,z) \\to (0,0,0) \\\\ (x,y,z) \\in B}} \\frac{xyz}{x + y + z} &= \\lim_{x \\to 0} \\frac{x \\cdot x \\cdot (x^3 - 2x)}{x + x + x^3 - 2x} \\\\ &= \\lim_{x \\to 0} \\frac{x^5 - 2x^3}{x^3} \\\\ &= \\lim_{x \\to 0} (x^2 - 2) = -2 \\end{aligned}$$\n:::",
+      "dibujos": [
+        {
+          "src": "books/cya-3-rosales/img/caminos-r3.svg",
+          "pie": "Dos caminos en ℝ³",
+          "debajo": "La curva $B$ está elegida para que el denominador sea $x^3$: así sobrevive un número distinto de 0. Como $0 \\neq -2$, el límite no existe."
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Ejm: xyz / (x² + y² + z²)",
+      "contenido": "### Ejm\n:::lapiz\n$$\\lim_{(x,y,z) \\to (0,0,0)} \\frac{xyz}{x^2 + y^2 + z^2} = 0$$\n\nSea $\\varepsilon > 0$ y halle $\\delta > 0$ tq $\\forall (x, y, z)$ con\n$$0 < \\|(x, y, z) - (0, 0, 0)\\| < \\delta \\Rightarrow \\left|\\frac{xyz}{x^2 + y^2 + z^2}\\right| < \\varepsilon$$\n\nEn efecto:\n$$\\begin{aligned} \\left|\\frac{xyz}{x^2 + y^2 + z^2}\\right| &= \\frac{|x||y||z|}{x^2 + y^2 + z^2} \\\\ &\\le \\frac{\\left(\\sqrt{x^2 + y^2 + z^2}\\right)^3}{x^2 + y^2 + z^2} \\\\ &= \\sqrt{x^2 + y^2 + z^2} < \\delta < \\varepsilon \\end{aligned}$$\n\nTome $0 < \\delta < \\varepsilon$.\n:::",
+      "nota": "Corroboración: con $0 < \\delta < \\varepsilon$, si $0 < \\|(x, y, z)\\| < \\delta$, la cadena da $|f| \\le \\|(x, y, z)\\| < \\delta < \\varepsilon$ ✓ (cada $|x|, |y|, |z|$ se acota por la norma)."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "sen(1/x) no existe",
+      "contenido": ":::azul\n$\\displaystyle\\lim_{x \\to 0} \\operatorname{sen}\\left(\\frac{1}{x}\\right)$ no existe. Uno puede usar **sucesiones** para demostrarlo.\n:::\n\n**Demostración:**\n:::lapiz\n$$x_n = \\frac{1}{\\frac{\\pi}{2} + 2n\\pi} \\xrightarrow[n \\to \\infty]{} 0, \\qquad y_n = \\frac{1}{\\frac{3\\pi}{2} + 2n\\pi} \\xrightarrow[n \\to \\infty]{} 0$$\n\nEstudiando:\n$$\\lim_{n \\to \\infty} \\operatorname{sen}\\left(\\tfrac{1}{x_n}\\right) = \\lim_{n \\to \\infty} \\operatorname{sen}\\left(\\tfrac{\\pi}{2} + 2n\\pi\\right) = \\operatorname{sen}\\left(\\tfrac{\\pi}{2}\\right) = 1$$\n$$\\lim_{n \\to \\infty} \\operatorname{sen}\\left(\\tfrac{1}{y_n}\\right) = \\lim_{n \\to \\infty} \\operatorname{sen}\\left(\\tfrac{3\\pi}{2} + 2n\\pi\\right) = \\operatorname{sen}\\left(\\tfrac{3\\pi}{2}\\right) = -1$$\n:::",
+      "dibujos": [
+        {
+          "src": "books/cya-3-rosales/img/sen-1x.svg",
+          "pie": "$\\operatorname{sen}(1/x)$",
+          "debajo": "Las dos sucesiones van a 0, pero en una la función vale siempre 1 y en la otra $-1$. Es la misma idea que los caminos en $\\mathbb{R}^2$."
+        }
+      ]
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Funciones continuas",
+      "contenido": "### Funciones continuas en un punto en $\\mathbb{R}^2$ y $\\mathbb{R}^3$\n:::azul\nSea $f : \\mathbb{R}^2 \\to \\mathbb{R}$ una función definida en $(a, b)$. $f(x, y)$ es **continua** en $(a, b)$ si:\n$$\\lim_{(x,y) \\to (a,b)} f(x, y) = f(a, b)$$\n:::\n\n**Mutatis mutandis:**\n:::azul\n$$\\lim_{(x,y,z) \\to (a,b,c)} f(x, y, z) = f(a, b, c)$$\n:::\n\n:::azul\nSea $f : D \\subset \\mathbb{R}^2 \\to \\mathbb{R}$: $f(x, y)$ es continua en $D$ si es continua en cada punto $(a, b) \\in D$.\n:::",
+      "nota": [
+        "Continua en un punto pide tres cosas: que $f(a, b)$ exista, que el límite exista y que los dos sean iguales.",
+        "«Mutatis mutandis»: cambiando lo que haya que cambiar (aquí, pasar a tres variables)."
+      ]
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Ejercicio: continuidad y signo",
+      "contenido": "### Ejercicio\n:::lapiz\nSea $f : \\mathbb{R}^3 \\to \\mathbb{R}$ continua en $(a, b, c)$ con $f(a, b, c) > 0$. Pruebe que existe $B((a, b, c), r)$ tq\n$$f(x, y, z) > 0 \\quad \\forall (x, y, z) \\in B((a, b, c), r)$$\n:::\n\nPor la continuidad: $\\forall\\, \\varepsilon > 0\\ \\exists\\, \\delta > 0$ tq $\\forall (x, y)$ con\n$$\\boxed{0 < \\|(x, y) - (a, b)\\| < \\delta} \\Rightarrow |f(x, y) - f(a, b)| < \\varepsilon$$\n\nEl recuadro dice $(x, y) \\in B((a, b), \\delta)$, y entonces $f(x, y) \\in \\left]f(a, b) - \\varepsilon,\\ f(a, b) + \\varepsilon\\right[$.",
+      "dibujos": [
+        {
+          "src": "books/cya-3-rosales/img/continua-positiva.svg",
+          "pie": "Un intervalo de ancho $2\\varepsilon$",
+          "debajo": "Tome $\\varepsilon = \\frac{f(a, b, c)}{2}$: el intervalo empieza en $\\frac{f(a, b, c)}{2} > 0$, así que dentro de la bola $f$ es positiva, con $r = \\delta$."
+        }
+      ],
+      "nota": "Hace falta suponer $f(a, b, c) > 0$; si no, el enunciado no se cumple."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Álgebra de funciones continuas",
+      "contenido": ":::azul\nSi $\\displaystyle\\lim_{(x,y) \\to (a,b)} f(x, y) = L_1$ y $\\displaystyle\\lim_{(x,y) \\to (a,b)} g(x, y) = L_2$:\n$$\\Rightarrow \\lim_{(x,y) \\to (a,b)} \\big(f(x, y) + g(x, y)\\big) = L_1 + L_2$$\n:::",
+      "nota": "El truco del $\\frac{\\varepsilon}{2}$: se pide la mitad a cada función para que la suma quede menor que $\\varepsilon$."
+    },
+    {
+      "tipo": "texto",
+      "titulo": "Álgebra: la demostración",
+      "contenido": "**Dem:**\n:::lapiz\nSea $\\varepsilon > 0$; hallemos $\\delta > 0$ tq $\\forall (x, y)$ con $\\|(x, y) - (a, b)\\| < \\delta$:\n$$|f + g - (L_1 + L_2)| < \\varepsilon$$\n\nPor hip., $\\exists\\, \\delta_1 > 0$ y $\\delta_2 > 0$ tq:\n$$\\|(x, y) - (a, b)\\| < \\delta_1 \\Rightarrow |f(x, y) - L_1| < \\tfrac{\\varepsilon}{2}$$\n$$\\|(x, y) - (a, b)\\| < \\delta_2 \\Rightarrow |g(x, y) - L_2| < \\tfrac{\\varepsilon}{2}$$\n\nTome $0 < \\delta < \\min\\{\\delta_1, \\delta_2\\}$. $\\forall (x, y)$ con $\\|(x, y) - (a, b)\\| < \\delta$:\n$$\\begin{aligned} |f + g - (L_1 + L_2)| &= |f - L_1 + g - L_2| \\\\ &\\le |f - L_1| + |g - L_2| \\\\ &< \\tfrac{\\varepsilon}{2} + \\tfrac{\\varepsilon}{2} = \\varepsilon \\end{aligned}$$\n:::"
     }
   ]
 }

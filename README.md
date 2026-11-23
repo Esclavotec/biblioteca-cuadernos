@@ -199,6 +199,8 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 
 ## Historial de cambios
 
+- **v1.3.6 (2026-11-23). I parcial completo.** CyA III llega a 99 páginas, con límites y continuidad en ℝ² y ℝ³: definición ε-δ, dos pruebas de límites, la no existencia por caminos (ejes, rectas y parábola, curvas en ℝ³), sen(1/x) con sucesiones, continuidad y álgebra de límites. Hay 6 dibujos nuevos.
+
 - **v1.3.5 (2026-11-23). Más materia del I parcial y PDF compacto.**
   - CyA III pasa de 38 a 82 páginas: planos, ecuación de cilindros y conos, parametrización de curvas, velocidad y aceleración, triedro de Frenet, curvatura y torsión, superficies de revolución (globo de Monge), campos escalares y topología en ℝⁿ (bolas, abiertos, interior, cerrados, frontera). Son 20 dibujos nuevos.
   - El PDF ya no usa una hoja por página: los temas van seguidos con su «p. N», y el índice va a dos columnas. Con las 82 páginas sale en 44 hojas en vez de unas 88.

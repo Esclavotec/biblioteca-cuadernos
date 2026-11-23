@@ -5,9 +5,9 @@
  * El botón "✍️ Firmar" abre una hoja en blanco con lápices de colores, grosores,
  * borrador, deshacer y limpiar. Al guardar, el cuaderno se recarga en la nueva página.
  */
-import { BookViewer } from './book.js?v=1.3.5';
-import { store, validarFirma, LIMITES } from './store.js?v=1.3.5';
-import { toast } from './util.js?v=1.3.5';
+import { BookViewer } from './book.js?v=1.3.6';
+import { store, validarFirma, LIMITES } from './store.js?v=1.3.6';
+import { toast } from './util.js?v=1.3.6';
 
 const COLORES = ['#1f2937', '#c0392b', '#2563eb', '#16a34a', '#d97706', '#9333ea', '#db2777', '#0d9488'];
 const GROSORES = [3, 7, 14, 28];        // en píxeles del lienzo

@@ -593,5 +593,82 @@ D['frontera'] = svg(280, 220, (() => {
     texto([210, 120], 'A: x > 2', { size: 13, anchor: 'middle' });
 })(), 'La frontera de x > 2 es la recta x = 2: toda bola con centro ahí toca A y su complemento');
 
+/* ======================= I parcial: límites y continuidad ======================= */
+
+/** Disco alrededor de (a,b) en el plano y la función que lo manda a un intervalo de la recta real. */
+function dibujoLimite({ centro = 'L', izq = 'L − ε', der = 'L + ε', positivo = false } = {}) {
+  const c = [80, 95], R = 30;
+  let out = flecha([14, 170], [170, 170], { c: SUAVE, w: 1.2 }) + flecha([30, 196], [30, 16], { c: SUAVE, w: 1.2 }) +
+    `<circle cx="${c[0]}" cy="${c[1]}" r="${R}" fill="rgba(44,61,156,.12)"/>` + circulo(c, R, { dash: '5 4', c: AZUL, w: 1.6 }) +
+    linea([c, [c[0] + 21, c[1] - 21]], { c: AZUL, w: 1.4 }) + punto(c) +
+    texto([c[0] - 18, c[1] + 18], '(a, b)', { size: 12 }) + texto([c[0] + 12, c[1] - 16], 'δ', { size: 13, c: AZUL });
+  // Recta real a la derecha (vertical)
+  const X = 236, y0 = 200, y1 = 18;
+  out += flecha([X, y0], [X, y1]) + texto([X + 8, y1 + 6], 'ℝ', { size: 14, italic: false });
+  const m = 90, e = 34;
+  out += linea([[X - 7, m - e], [X + 7, m - e]], { c: ROJO, w: 2 }) + linea([[X - 7, m + e], [X + 7, m + e]], { c: ROJO, w: 2 }) +
+    linea([[X, m - e], [X, m + e]], { c: ROJO, w: 3.2 }) + punto([X, m], { c: ROJO }) +
+    texto([X + 10, m + 4], centro, { size: 12, c: ROJO }) +
+    texto([X + 10, m - e + 4], der, { size: 11, c: ROJO }) + texto([X + 10, m + e + 4], izq, { size: 11, c: ROJO });
+  if (positivo) out += linea([[X - 9, 182], [X + 9, 182]], { w: 1.6 }) + texto([X + 12, 186], '0', { size: 12 });
+  const arco = [];
+  for (let i = 0; i <= 24; i++) { const s = i / 24; arco.push([c[0] + R + (X - 16 - c[0] - R) * s, c[1] - 10 - 50 * Math.sin(Math.PI * s) + (m - c[1] + 10) * s]); }
+  out += linea(arco, { dash: true, c: SUAVE }) + punta(arco[22], arco[24], { c: SUAVE }) + texto([150, 40], 'f', { size: 15 });
+  return out;
+}
+
+D['limite-r2'] = svg(310, 210, dibujoLimite(), 'Los puntos a distancia menor que δ de (a, b) caen a distancia menor que ε de L');
+
+D['continua-positiva'] = svg(310, 210, dibujoLimite({ centro: 'f(a,b)', izq: 'f − ε', der: 'f + ε', positivo: true }),
+  'Si f es continua y f(a, b) > 0, con ε = f(a, b)/2 todo el intervalo queda por encima de 0');
+
+D['caminos-ejes'] = svg(280, 220, (() => {
+  const O = [140, 110];
+  let out = flecha([16, O[1]], [264, O[1]], { c: SUAVE, w: 1.2 }) + flecha([O[0], 206], [O[0], 14], { c: SUAVE, w: 1.2 });
+  for (const [a, b] of [[[40, O[1]], [118, O[1]]], [[240, O[1]], [162, O[1]]]]) out += linea([a, b], { c: AZUL, w: 2.2 }) + punta(a, b, { c: AZUL, w: 2.2 });
+  for (const [a, b] of [[[O[0], 24], [O[0], 88]], [[O[0], 196], [O[0], 132]]]) out += linea([a, b], { c: ROJO, w: 2.2 }) + punta(a, b, { c: ROJO, w: 2.2 });
+  return out + `<circle cx="${O[0]}" cy="${O[1]}" r="4" fill="#fff" stroke="${LAPIZ}" stroke-width="1.5"/>` +
+    texto([40, O[1] - 10], 'A: y = 0 → 1', { size: 12, c: AZUL }) + texto([O[0] + 10, 34], 'B: x = 0 → −1', { size: 12, c: ROJO }) +
+    texto([O[0] + 8, O[1] + 18], '(0,0)', { size: 11 });
+})(), 'Por el eje x el límite da 1 y por el eje y da −1: no existe');
+
+D['caminos-parabola'] = svg(300, 230, (() => {
+  const O = [150, 150], s = 60;
+  let out = flecha([20, O[1]], [284, O[1]], { c: SUAVE, w: 1.2 }) + flecha([O[0], 222], [O[0], 14], { c: SUAVE, w: 1.2 });
+  for (const m of [1.3, -0.7, 0.35]) out += linea([[O[0] - 2 * s, O[1] + 2 * s * m], [O[0] + 2 * s, O[1] - 2 * s * m]], { c: AZUL, w: 1.4 });
+  const par = []; for (let i = -40; i <= 40; i++) { const x = i / 20; par.push([O[0] + x * s, O[1] - x * x * s * 0.6]); }
+  out += linea(par, { c: ROJO, w: 2.2 }) + punta(par[6], par[8], { c: ROJO, w: 2 }) + punta(par[74], par[72], { c: ROJO, w: 2 });
+  return out + `<circle cx="${O[0]}" cy="${O[1]}" r="4" fill="#fff" stroke="${LAPIZ}" stroke-width="1.5"/>` +
+    texto([24, 216], 'rectas y = mx → 0', { size: 12, c: AZUL }) + texto([196, 26], 'y = x² → ½', { size: 13, c: ROJO });
+})(), 'Por todas las rectas el límite da 0, pero por la parábola y = x² da 1/2');
+
+D['caminos-r3'] = svg(280, 230, (() => {
+  const cam = camara({ s: 70, cx: 140, cy: 120 });
+  const B = (x) => [x, x, x * x * x - 2 * x];
+  let out = ejes(cam, { x: [-1.2, 1.7], y: [-1.2, 1.7], z: [-1.2, 1.4] }) +
+    curva3(cam, B, -0.75, 0.75, { c: ROJO, w: 2.2 }) +
+    linea3(cam, [[1.3, 0, 0], [0.12, 0, 0]], { c: AZUL, w: 2.2 }) + punta(cam.p([0.3, 0, 0]), cam.p([0.12, 0, 0]), { c: AZUL, w: 2.2 });
+  out += punta(cam.p(B(-0.3)), cam.p(B(-0.12)), { c: ROJO, w: 2 });
+  return out + punto3(cam, [0, 0, 0]) +
+    texto(add(cam.p([1.3, 0, 0]), [-60, 18]), 'A → 0', { size: 12, c: AZUL }) +
+    texto(add(cam.p(B(0.75)), [4, -6]), 'B → −2', { size: 12, c: ROJO });
+})(), 'En ℝ³ se puede llegar al origen por el eje x (da 0) o por la curva B (da −2)');
+
+D['sen-1x'] = svg(320, 200, (() => {
+  const O = [160, 100], sx = 140, sy = 60;
+  let out = flecha([14, O[1]], [306, O[1]], { c: SUAVE, w: 1.2 }) + flecha([O[0], 190], [O[0], 12], { c: SUAVE, w: 1.2 });
+  const pts = [];
+  for (let i = 1; i <= 1600; i++) { const x = (i / 1600); pts.push([O[0] + x * sx, O[1] - Math.sin(1 / Math.max(x, 0.004)) * sy]); }
+  const neg = pts.map(([x, y]) => [2 * O[0] - x, 2 * O[1] - y]).reverse();
+  out += linea(neg, { c: AZUL, w: 1.1 }) + linea(pts, { c: AZUL, w: 1.1 });
+  for (let n = 0; n < 3; n++) {
+    const xn = 1 / (Math.PI / 2 + 2 * n * Math.PI), yn = 1 / (3 * Math.PI / 2 + 2 * n * Math.PI);
+    out += punto([O[0] + xn * sx, O[1] - sy], { c: ROJO, r: 3.2 }) + punto([O[0] + yn * sx, O[1] + sy], { c: VERDE, r: 3.2 });
+  }
+  out += linea([[O[0] - 6, O[1] - sy], [O[0] + 6, O[1] - sy]], { w: 1.2 }) + linea([[O[0] - 6, O[1] + sy], [O[0] + 6, O[1] + sy]], { w: 1.2 });
+  return out + texto([O[0] - 10, O[1] - sy + 4], '1', { size: 12, anchor: 'end' }) + texto([O[0] - 10, O[1] + sy + 4], '−1', { size: 12, anchor: 'end' }) +
+    texto([214, O[1] - sy - 8], 'xₙ → sen = 1', { size: 12, c: ROJO }) + texto([214, O[1] + sy + 18], 'yₙ → sen = −1', { size: 12, c: VERDE });
+})(), 'sen(1/x) oscila cada vez más rápido cerca de 0: por xₙ vale 1 y por yₙ vale −1');
+
 for (const [nombre, contenido] of Object.entries(D)) writeFileSync(path.join(OUT, `${nombre}.svg`), contenido);
 console.log(`${Object.keys(D).length} dibujos en ${path.relative(root, OUT)}`);

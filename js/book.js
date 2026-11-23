@@ -13,8 +13,8 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js?v=1.4.0';
-import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.4.0';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.4.2';
+import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.4.2';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
 const PROPORCION = 1.414;                                  // alto / ancho de una hoja A4

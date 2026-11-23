@@ -711,5 +711,85 @@ D['camino-raiz'] = svg(280, 200, (() => {
     texto([140, O[1] + 18], 'ejes: f = 0', { size: 12, c: AZUL }) + texto([130, 96], 'y = √x: f → ½', { size: 13, c: ROJO });
 })(), 'Las derivadas parciales en el origen valen 0, pero por y = √x la función tiende a 1/2: no es continua');
 
+/* ======================= II parcial: regla de la cadena y plano tangente ======================= */
+
+D['regla-cadena'] = svg(340, 200, (() => {
+  let out = flecha([14, 120], [110, 120], { c: SUAVE, w: 1.2 }) + texto([14, 112], 'ℝ', { size: 15, italic: false });
+  out += linea([[44, 114], [44, 126]], { c: AZUL, w: 2 }) + linea([[86, 114], [86, 126]], { c: AZUL, w: 2 }) + linea([[44, 120], [86, 120]], { c: AZUL, w: 3 }) + texto([60, 142], 'I', { size: 14, c: AZUL });
+  const cam = camara({ s: 34, cx: 180, cy: 140 });
+  out += ejes(cam, { x: [0, 1.6], y: [0, 1.8], z: [0, 2.6] }, { nombres: { x: '', y: '', z: '' } });
+  const blob = []; for (let i = 0; i <= 60; i++) { const t = i / 60 * 2 * Math.PI; const r = 22 + 4 * Math.sin(5 * t); blob.push([200 + r * Math.cos(t), 70 + 0.8 * r * Math.sin(t)]); }
+  out += linea(blob, { c: AZUL, w: 1.6, fill: 'rgba(44,61,156,.08)' }) + texto([222, 46], 'S', { size: 14, c: AZUL });
+  out += flecha([272, 150], [330, 150], { c: SUAVE, w: 1.2 }) + texto([318, 140], 'ℝ', { size: 15, italic: false });
+  const arco = (a, b, alto) => { const p = []; for (let i = 0; i <= 24; i++) { const s = i / 24; p.push([a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s - alto * Math.sin(Math.PI * s)]); } return p; };
+  const a1 = arco([70, 110], [176, 72], 40), a2 = arco([226, 76], [300, 140], 30), a3 = arco([66, 132], [300, 160], -40);
+  out += linea(a1, { c: LAPIZ, w: 1.3 }) + punta(a1[22], a1[24]) + texto([110, 38], 'α', { size: 15 });
+  out += linea(a2, { c: LAPIZ, w: 1.3 }) + punta(a2[22], a2[24]) + texto([268, 82], 'f', { size: 15 });
+  out += linea(a3, { c: ROJO, w: 1.5, dash: true }) + punta(a3[22], a3[24], { c: ROJO }) + texto([180, 196], 'f ∘ α', { size: 14, c: ROJO, anchor: 'middle' });
+  return out;
+})(), 'Regla de la cadena: la curva α lleva I a S y f lleva S a ℝ');
+
+D['gradiente-normal'] = svg(300, 250, (() => {
+  const cam = camara({ s: 80, cx: 140, cy: 135, el: 20 });
+  const ph = 0.75, th = 0.5;
+  const A = [Math.sin(ph) * Math.cos(th), Math.sin(ph) * Math.sin(th), Math.cos(ph)];
+  const e1 = [-Math.sin(th), Math.cos(th), 0], e2 = [Math.cos(ph) * Math.cos(th), Math.cos(ph) * Math.sin(th), -Math.sin(ph)];
+  const k = 0.45;
+  const esq = [add(A, add(mul(e1, k), mul(e2, k))), add(A, add(mul(e1, -k), mul(e2, k))), add(A, add(mul(e1, -k), mul(e2, -k))), add(A, add(mul(e1, k), mul(e2, -k)))];
+  const gc = (t) => add(mul(A, Math.cos(t)), mul(e1, Math.sin(t)));
+  return esfera(cam, [0, 0, 0], 1, { op: { w: 1.4 } }) +
+    curva3(cam, gc, -1.2, 1.2, { c: VERDE, w: 1.8 }) +
+    linea3(cam, esq, { cerrar: true, c: AZUL, w: 1.5, fill: 'rgba(44,61,156,.10)' }) +
+    flecha3(cam, A, mul(A, 1.75), { c: ROJO, w: 2.2 }) + flecha3(cam, A, add(A, mul(e1, 0.5)), { c: VERDE, w: 2 }) + punto3(cam, A) +
+    texto(add(cam.p(mul(A, 1.75)), [6, -2]), '∇F(a)', { size: 13, c: ROJO }) +
+    texto(add(cam.p(A), [-14, 16]), 'a', { size: 14 }) +
+    texto(add(cam.p(add(A, mul(e1, 0.5))), [4, 14]), 'T', { size: 13, c: VERDE }) +
+    texto([10, 242], 'S: F(x, y, z) = k · ∇F(a) ⊥ S', { size: 12 });
+})(), 'El gradiente es perpendicular a la superficie de nivel y a toda curva en ella; es el normal del plano tangente');
+
+D['paraboloide-tangente'] = svg(280, 230, (() => {
+  const cam = camara({ s: 55, cx: 130, cy: 175, el: 18 });
+  const sup = revolucion(cam, { r: (t) => Math.sqrt(Math.max(t, 0)) });
+  const P = [0.55, 0.3, 0.55 * 0.55 + 0.3 * 0.3];
+  const n = [2 * P[0], 2 * P[1], -1];
+  const u = [1, 0, 2 * P[0]], w = [0, 1, 2 * P[1]];
+  const L = 0.7;
+  const esq = [add(P, add(mul(u, L), mul(w, L))), add(P, add(mul(u, -L), mul(w, L))), add(P, add(mul(u, -L), mul(w, -L))), add(P, add(mul(u, L), mul(w, -L)))];
+  return eje(cam, 'x', 0, 1.9) + eje(cam, 'y', -0.2, 2.0) +
+    sup.contorno(0.001, 2.0) + sup.aro(2.0, 'completo') + eje(cam, 'z', 0, 2.6, { ocultos: [[0, 2.0]] }) +
+    linea3(cam, esq, { cerrar: true, c: AZUL, w: 1.5, fill: 'rgba(44,61,156,.10)' }) +
+    flecha3(cam, P, add(P, mul(n, -0.6)), { c: ROJO, w: 2.2 }) + punto3(cam, P) +
+    texto(add(cam.p(add(P, mul(n, -0.6))), [6, 0]), 'normal ∥ v', { size: 12, c: ROJO }) +
+    texto([10, 222], 'plano tangente con normal paralela a v', { size: 12 });
+})(), 'Plano tangente al paraboloide cuyo normal es paralelo a un vector dado');
+
+/* ======================= II parcial: máximos, mínimos y Lagrange ======================= */
+
+D['lagrange-circulo'] = svg(280, 240, (() => {
+  const O = [140, 120], s = 70;
+  const P = (x, y) => [O[0] + x * s, O[1] - y * s];
+  let out = flecha([14, O[1]], [266, O[1]], { c: SUAVE, w: 1.2 }) + flecha([O[0], 232], [O[0], 10], { c: SUAVE, w: 1.2 });
+  for (const c of [-1.414, -0.7, 0, 0.7, 1.414]) out += linea([P(c - 1.7, 1.7), P(c + 1.7, -1.7)].map(([x, y]) => [x, y]), { c: c === 1.414 || c === -1.414 ? ROJO : SUAVE, w: c === 1.414 || c === -1.414 ? 1.6 : 1, dash: !(c === 1.414 || c === -1.414) });
+  out += circulo(O, s, { c: AZUL, w: 2 });
+  const M = P(0.7071, 0.7071), m = P(-0.7071, -0.7071);
+  out += flecha(M, P(1.15, 1.15), { c: VERDE, w: 1.8 }) + punto(M, { c: ROJO }) + punto(m, { c: ROJO });
+  return out + texto([M[0] + 6, M[1] - 10], 'máx √2', { size: 12, c: ROJO }) + texto([m[0] - 50, m[1] + 18], 'mín −√2', { size: 12, c: ROJO }) +
+    texto(P(1.12, 1.25), '∇f ∥ ∇g', { size: 12, c: VERDE }) + texto([16, 230], 'rectas x + y = c · círculo x² + y² = 1', { size: 11 });
+})(), 'Lagrange: en el máximo y el mínimo la recta x + y = c toca el círculo, y los gradientes son paralelos');
+
+D['elipse-restriccion'] = svg(280, 240, (() => {
+  const O = [140, 120], s = 62;
+  const P = (x, y) => [O[0] + x * s, O[1] - y * s];
+  const a = Math.sqrt(2 / 3), b = Math.SQRT2, r = Math.SQRT1_2;
+  const el = []; for (let i = 0; i <= 96; i++) { const t = i / 96 * 2 * Math.PI; const u = a * Math.cos(t), v = b * Math.sin(t); el.push(P(r * (u + v), r * (u - v))); }
+  let out = linea(el, { c: AZUL, w: 2, fill: 'url(#rayas)', cerrar: true }) +
+    flecha([14, O[1]], [266, O[1]], { c: SUAVE, w: 1.2 }) + flecha([O[0], 232], [O[0], 10], { c: SUAVE, w: 1.2 });
+  const q = 1 / Math.sqrt(3);
+  out += punto(P(0, 0), { c: VERDE }) + punto(P(q, q)) + punto(P(-q, -q)) + punto(P(1, -1), { c: ROJO }) + punto(P(-1, 1), { c: ROJO });
+  return out + texto([O[0] + 6, O[1] + 16], 'mín: 1', { size: 11, c: VERDE }) + texto(P(1.05, -1.1), 'máx: e²', { size: 12, c: ROJO }) +
+    texto(P(-1.9, 1.2), 'máx: e²', { size: 12, c: ROJO }) + texto(P(q + 0.08, q + 0.12), 'e^{2/3}'.replace('^{2/3}', '²ᐟ³'), { size: 11 }) +
+    texto([16, 232], 'x² + xy + y² ≤ 1 (elipse y su interior)', { size: 11 });
+})(), 'La elipse x² + xy + y² ≤ 1 con los candidatos: el centro (mínimo) y los puntos del borde');
+
 for (const [nombre, contenido] of Object.entries(D)) writeFileSync(path.join(OUT, `${nombre}.svg`), contenido);
 console.log(`${Object.keys(D).length} dibujos en ${path.relative(root, OUT)}`);

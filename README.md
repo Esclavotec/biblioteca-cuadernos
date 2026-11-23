@@ -55,7 +55,8 @@ biblioteca-cuadernos/
 ├── tests/                  Tests automáticos (node --test)
 └── tools/
     ├── serve.mjs           Servidor local sin dependencias
-    └── dibujos/            Generadores de los dibujos SVG (lib.mjs + uno por cuaderno)
+    ├── dibujos/            Generadores de los dibujos SVG (lib.mjs + uno por cuaderno)
+    └── cuadernos/          Fuente del texto de cada cuaderno (genera books/<id>.json)
 ```
 
 ```mermaid
@@ -198,6 +199,9 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.4.2 (2026-11-23). II parcial completo.** CyA III llega a 176 páginas: regla de la cadena, derivada direccional en una curva, superficies de nivel y plano tangente, campos vectoriales y el diagrama molecular, funciones homogéneas (Euler), derivación implícita, máximos y mínimos, Taylor de orden 2, la Hessiana, el criterio de los menores (Gulden Finger), Lagrange y conjuntos compactos. Hay 5 dibujos nuevos.
+  - El texto del cuaderno se genera con `python3 tools/cuadernos/cya-3-rosales/cya3.py books/cya-3-rosales.json`. Para corregir algo, se edita el `parteN.py` que corresponda y se vuelve a generar.
 
 - **v1.4.1 (2026-11-23). Empieza el II parcial.** Hay una portadilla "II parcial" y 36 páginas nuevas en CyA III: producto de límites, derivada direccional y derivadas parciales, gradiente, el teorema g(t) = f(a + tv), valor medio para campos escalares, derivadas de orden superior, ejercicios #18 y #19 del Apóstol, diferenciabilidad (definición, unicidad, T(y) = ∇f(a)·y) y ejemplos. Son 3 dibujos nuevos.
 

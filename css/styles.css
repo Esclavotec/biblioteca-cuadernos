@@ -201,7 +201,7 @@ button { font: inherit; color: inherit; }
 
 .stage { position: relative; z-index: 1; display: grid; place-items: center; min-height: 0; padding: 4px 16px; }
 .book-frame {
-  width: min(94vw, 1160px, calc((100dvh - 172px) / 1.38 * 2));
+  width: min(94vw, 1160px, calc((100dvh - 172px) / 1.414 * 2));
   transition: transform .7s var(--ease-out);
 }
 /* Con la tapa cerrada el libro ocupa solo media plana: lo centramos */
@@ -233,7 +233,7 @@ button { font: inherit; color: inherit; }
 
 .paper-face, .cover-face { position: absolute; inset: 0; overflow: hidden; }
 .paper-face {
-  --lh: 6cqi;                   /* alto de renglón proporcional al ancho de la hoja */
+  --lh: 4.9cqi;                 /* alto de renglón proporcional al ancho de la hoja (≈ 29 renglones en A4) */
   --top: calc(var(--lh) * 2);
   --left: 14cqi;
   background-color: var(--paper);
@@ -417,9 +417,17 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 .pc-nueva p { font-family: var(--hand); font-size: 1.7em; }
 .pc-nueva .btn { background: #1c1f1d; color: #f4f4f1; box-shadow: none; font-size: max(14px, .9em); }
 .viewer.guest .page-content { padding-top: 8cqi; }
+.viewer.guest .paper-face { --lh: 6cqi; }  /* las firmas conservan su tamaño */
+
+/* Acomodo automático: varios temas en una hoja, separados por una línea fina */
+.tema + .tema { margin-top: calc(var(--lh) * .8); padding-top: calc(var(--lh) * .6); border-top: 1.5px solid rgba(28, 31, 29, .1); }
+.tema.cont > :first-child { margin-top: 0; }             /* tema que viene de la hoja anterior */
+.medidor { position: fixed !important; left: -10000px; top: 0; width: 500px !important; visibility: hidden; pointer-events: none; transition: none !important; }
+.medidor .libre .paper-face { position: relative; inset: auto; overflow: visible; }
+.medidor .libre .page-content { position: relative; inset: auto; overflow: visible; }
 
 /* Modo sin librería (si el CDN falla): una página a la vez */
-.fallback-book { position: relative; width: min(calc(100vw - 32px), calc((100dvh - 172px) / 1.38)); aspect-ratio: 1 / 1.38; }
+.fallback-book { position: relative; width: min(calc(100vw - 32px), calc((100dvh - 172px) / 1.414)); aspect-ratio: 1 / 1.414; }
 .fallback-book .page { position: absolute; inset: 0; display: none; }
 .fallback-book .page.current { display: block; }
 

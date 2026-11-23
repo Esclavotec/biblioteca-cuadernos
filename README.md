@@ -28,7 +28,7 @@ Al acercar el mouse a una esquina, la hoja se levanta un poco para indicar que s
 
 **PDF.** El botón PDF arma el cuaderno completo en A4 y abre el diálogo de impresión. Para no desperdiciar papel, la portada y el índice (a dos columnas) van en hojas propias, y los temas siguen uno tras otro. Cada tema lleva arriba a la derecha su número de página del cuaderno («p. 12»), que es el que usa el índice. El texto, las fórmulas y los dibujos quedan como vectores, y cada post-it lleva debajo lo que se lee al levantarlo.
 
-Cada página tiene un número abajo. La URL también lo guarda (`#/libro/ejemplo-git/4`), así que para pedir una corrección basta con decir *"libro X, página N"*.
+Cada hoja tiene un número abajo. Como las hojas se acomodan según la pantalla, el número puede ser distinto en la computadora y en el celular; para pedir una corrección es mejor decir el título del tema. La URL también lo guarda (`#/libro/ejemplo-git/4`), así que para pedir una corrección basta con decir *"libro X, página N"*.
 
 ---
 
@@ -198,6 +198,13 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.4.0 (2026-11-23). Hojas A4 con acomodo automático.**
+  - Las hojas tienen proporción A4 (1 : √2) y en la computadora la letra es un poco más chica (unos 29 renglones por hoja).
+  - El contenido corre de hoja en hoja como en un cuaderno de verdad: el visor mide cada bloque (párrafo, fórmula, dibujo, nota) y llena cada hoja antes de pasar a la siguiente. Un bloque nunca se corta, un título no se queda solo al pie y las portadillas van solas. En la computadora CyA III pasó de 107 a 76 hojas, y ninguna necesita scroll.
+  - En el celular la letra se mantiene grande para que se lea bien. Allí también se acomoda solo y sin scroll, aunque salen más hojas.
+  - Si la pantalla cambia entre una y dos hojas, el cuaderno se vuelve a acomodar y se queda en el mismo tema. El índice se numera con las hojas reales.
+  - En el JSON no cambia nada: cada página sigue siendo un tema, y el acomodo lo hace el visor.
 
 - **v1.3.6 (2026-11-23). I parcial completo.** CyA III llega a 99 páginas, con límites y continuidad en ℝ² y ℝ³: definición ε-δ, dos pruebas de límites, la no existencia por caminos (ejes, rectas y parábola, curvas en ℝ³), sen(1/x) con sucesiones, continuidad y álgebra de límites. Hay 6 dibujos nuevos.
 

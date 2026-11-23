@@ -13,10 +13,11 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js?v=1.3.6';
-import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.3.6';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.4.0';
+import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.4.0';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
+const PROPORCION = 1.414;                                  // alto / ancho de una hoja A4
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function formatDate(d) {
@@ -53,6 +54,53 @@ export function conIndice(paginas) {
   return { paginas: [...paginas.slice(0, inicio), ...indice, ...paginas.slice(inicio)], indice: inicio + 1 };
 }
 
+/**
+ * Acomodo automático, como en un cuaderno de verdad: el contenido corre de hoja en hoja.
+ * Cada tema se parte en bloques (párrafos, fórmulas, listas, dibujos, notas) medidos en orden;
+ * un bloque nunca se corta, y un título no se queda solo al pie de la hoja.
+ *   bloques[j] = { s: nº de página de origen, top, bottom, encabezado }  (posiciones en el flujo)
+ *   cap = alto útil de la hoja; porIndice = entradas de índice por hoja.
+ * Las páginas de tipo "titulo" van solas. Devuelve las hojas (listas de nº de bloque),
+ * las hojas de índice ya numeradas, el número de la primera hoja de índice y la hoja de cada tema.
+ */
+export function acomodar(paginas, bloques, { cap, porIndice = POR_HOJA_INDICE } = {}) {
+  const inicio = paginas[0]?.tipo === 'titulo' ? 1 : 0;
+  const hojas = [];
+  let cur = null, desde = 0;
+  for (let j = 0; j < bloques.length; j++) {
+    const b = bloques[j];
+    if (b.s < inicio) continue;
+    const sola = paginas[b.s]?.tipo === 'titulo';
+    let cabe = !!cur && b.bottom - desde <= cap;
+    if (cur && (sola || cur.sola)) cabe = cur.sola && sola && cur.s === b.s;   // portadillas: solas en su hoja
+    if (cabe && b.encabezado) {                       // el título baja junto con lo que le sigue
+      const sig = bloques[j + 1];
+      if (sig && sig.s === b.s && sig.bottom - desde > cap) cabe = false;
+    }
+    if (!cabe) { cur = { bloques: [], sola, s: b.s }; hojas.push(cur); desde = b.top; }
+    cur.bloques.push(j); cur.s = b.s;
+  }
+  const primeraHoja = new Map();
+  hojas.forEach((h, k) => h.bloques.forEach((j) => { if (!primeraHoja.has(bloques[j].s)) primeraHoja.set(bloques[j].s, k); }));
+  const temas = [...primeraHoja].filter(([sIdx]) => paginas[sIdx]?.titulo && paginas[sIdx].tipo !== 'titulo')
+    .map(([sIdx, k]) => ({ titulo: paginas[sIdx].titulo, k }));
+  const porHoja = Math.max(5, porIndice | 0);
+  const nIndice = temas.length >= 3 ? Math.ceil(temas.length / porHoja) : 0;
+  const numero = (k) => inicio + nIndice + k + 1;
+  const indice = [];
+  for (let h = 0; h < nIndice; h++) {
+    indice.push({
+      tipo: 'indice', titulo: h ? 'Índice (cont.)' : 'Índice',
+      entradas: temas.slice(h * porHoja, (h + 1) * porHoja).map(({ titulo, k }) => ({ titulo, pagina: numero(k) })),
+    });
+  }
+  const hojaDe = new Map([...primeraHoja].map(([sIdx, k]) => [paginas[sIdx], numero(k)]));
+  return { hojas: hojas.map((h) => h.bloques), indice, inicio, primeraIndice: nIndice ? inicio + 1 : 0, hojaDe };
+}
+
+/** HTML ya armado de una hoja acomodada (no puede venir de un JSON: la clave es un Symbol). */
+const HTML_HOJA = Symbol('html');
+
 export function pageInnerHtml(p) {
   if (!p) return '';
   let html = '';
@@ -84,7 +132,9 @@ export function pageInnerHtml(p) {
         `</div>`;
       break;
     }
-    case 'indice': // hojas generadas por conIndice(): cada tema lleva a su página
+    case 'hoja': // hoja del acomodo automático: su HTML lo arma el visor con bloques ya escapados
+      return p[HTML_HOJA] || '';
+    case 'indice': // hojas generadas por acomodar(): cada tema lleva a su página
       html = `<h2>${esc(p.titulo)}</h2><ol class="indice">` + (p.entradas || []).map((e) =>
         `<li><button type="button" data-act="goto" data-page="${e.pagina | 0}" aria-label="${esc(e.titulo)}, página ${e.pagina | 0}">` +
         `<span class="t">${esc(e.titulo)}</span><span class="puntos" aria-hidden="true"></span><span class="n">${e.pagina | 0}</span></button></li>`).join('') +
@@ -131,13 +181,12 @@ export class BookViewer {
     this.root = root;
     this.book = book;
     this.opts = opts;
-    this.content = Array.isArray(book.paginas) ? book.paginas : [];
+    this.fuente = Array.isArray(book.paginas) ? book.paginas : [];
+    this.content = this.fuente;
     this.indicePagina = 0;
-    if (opts.indice) ({ paginas: this.content, indice: this.indicePagina } = conIndice(this.content));
     this.papel = PAPELES.includes(book.papel) ? book.papel : 'blanco';
     this.destroyed = false;
-    const len = this.content.length;
-    this.page = Math.max(0, Math.min(len + 1, opts.startPage | 0));
+    this.page = Math.max(0, opts.startPage | 0);
 
     const color = /^#[0-9a-f]{6}$/i.test(book.color) ? book.color : '#3b3f3d';
     this.el = document.createElement('div');
@@ -167,17 +216,121 @@ export class BookViewer {
     document.addEventListener('keydown', this.onKey);
     this.onResize = () => { clearTimeout(this.fitTimer); this.fitTimer = setTimeout(() => this.fitMath(), 150); };
     window.addEventListener('resize', this.onResize);
-    if (opts.indice) {
-      this.extra.innerHTML =
-        (this.indicePagina ? `<button type="button" class="btn" data-act="indice" aria-label="Ir al índice"><i class="ph ph-list-bullets" aria-hidden="true"></i><span class="lbl">Índice</span></button>` : '') +
-        `<button type="button" class="btn" data-act="pdf" aria-label="Descargar en PDF"><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="lbl">PDF</span></button>`;
-    }
     root.appendChild(this.el);
-
-    this.pages = this.buildPages();
     document.fonts?.ready.then(() => this.fitMath());     // las fuentes de KaTeX cambian el ancho
+    if (opts.indice) this.preparar().then(() => this.montar());
+    else this.montar();
+  }
+
+  /** Arma las hojas del libro: con acomodo automático (cuadernos) o una página por hoja. */
+  async preparar() {
+    this.modoPortrait = this.host.clientWidth < 480;     // StPageFlip usa una sola hoja si no caben dos de 240 px
+    try {
+      const m = await this.medir(this.modoPortrait);
+      if (this.destroyed) return;
+      const r = acomodar(this.fuente, m.bloques, m);
+      const hojas = r.hojas.map((js) => ({ tipo: 'hoja', [HTML_HOJA]: this.htmlHoja(js, m.bloques), secciones: [...new Set(js.map((j) => m.bloques[j].s))] }));
+      this.content = [...this.fuente.slice(0, r.inicio), ...r.indice, ...hojas];
+      this.indicePagina = r.primeraIndice; this.hojaDe = r.hojaDe;
+    } catch {
+      ({ paginas: this.content, indice: this.indicePagina } = conIndice(this.fuente));
+      this.hojaDe = null;
+    }
+    this.extra.innerHTML =
+      (this.indicePagina ? `<button type="button" class="btn" data-act="indice" aria-label="Ir al índice"><i class="ph ph-list-bullets" aria-hidden="true"></i><span class="lbl">Índice</span></button>` : '') +
+      `<button type="button" class="btn" data-act="pdf" aria-label="Descargar en PDF"><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="lbl">PDF</span></button>`;
+  }
+
+  /**
+   * Mide cada tema en una hoja de prueba fuera de pantalla. Todo en la hoja escala con su ancho
+   * (unidades cqi y em), así que basta medir con un ancho de referencia y vale para cualquier pantalla.
+   */
+  async medir(portrait) {
+    const ANCHO = 500, ALTO = Math.round(ANCHO * PROPORCION);
+    const m = document.createElement('div');
+    m.className = `book-frame medidor${portrait ? ' portrait' : ''}`;
+    m.setAttribute('aria-hidden', 'true');
+    const temas = this.fuente.map((p) => `<section class="tema">${pageInnerHtml(p)}</section>`).join('');
+    const prueba = `<section class="tema">${pageInnerHtml({ tipo: 'indice', titulo: 'Índice', entradas: [{ titulo: 'a', pagina: 1 }, { titulo: 'b', pagina: 2 }] })}</section>`;
+    m.innerHTML = `<div class="page page-paper --right" style="position:relative;width:${ANCHO}px;height:${ALTO}px"><div class="paper-face ${this.papel}"><div class="page-content caja"></div></div></div>` +
+      `<div class="page page-paper --right libre" style="position:relative;width:${ANCHO}px"><div class="paper-face ${this.papel}"><div class="page-content">${temas}${prueba}</div></div></div>`;
+    this.el.appendChild(m);
+    try {
+      await Promise.all([document.fonts?.ready, ...[...m.querySelectorAll('img')].map((im) => (im.complete ? null : new Promise((ok) => { im.onload = im.onerror = ok; })))]);
+      this.fitMath(m);
+      const caja = m.querySelector('.caja'), cs = getComputedStyle(caja);
+      const cap = (caja.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom)) * 0.98;
+      const secs = [...m.querySelectorAll('.libre .tema')];
+      const prueba = secs.pop();                                         // la de prueba del índice
+      const base = m.querySelector('.libre .page-content').getBoundingClientRect().top;
+      const bloques = [];
+      secs.forEach((sec, sIdx) => {
+        for (const hijo of sec.children) {
+          // Los bloques de tinta (:::azul, :::lapiz) se parten por dentro para poder seguir en otra hoja
+          const partes = hijo.matches('div.tinta') && hijo.children.length > 1 ? [...hijo.children] : [hijo];
+          const grupo = partes.length > 1 ? bloques.length : -1;
+          for (const el of partes) {
+            const r = el.getBoundingClientRect();
+            bloques.push({ s: sIdx, top: r.top - base, bottom: r.bottom - base, encabezado: /^H[23]$/.test(el.tagName),
+              html: el.outerHTML, grupo, clase: grupo >= 0 ? hijo.className : '' });
+          }
+        }
+      });
+      const lis = [...prueba.querySelectorAll('li')].map((e) => e.getBoundingClientRect());
+      const porIndice = lis.length === 2 ? Math.floor((cap - (lis[0].top - prueba.getBoundingClientRect().top)) / (lis[1].top - lis[0].top)) : POR_HOJA_INDICE;
+      if (!(cap > 0) || !bloques.length) throw new Error('sin medidas');
+      return { bloques, cap, porIndice };
+    } finally { m.remove(); }
+  }
+
+  /** Junta los bloques de una hoja: cada tema en su <section>, y los trozos de una misma tinta en un solo div. */
+  htmlHoja(js, bloques) {
+    let html = '', abierta = -1, grupo = -1;
+    js.forEach((j, n) => {
+      const b = bloques[j];
+      if (b.s !== abierta) {
+        if (grupo >= 0) { html += '</div>'; grupo = -1; }
+        if (abierta >= 0) html += '</section>';
+        const sigue = n === 0 && j > 0 && bloques[j - 1].s === b.s;     // el tema empezó en la hoja anterior
+        html += `<section class="tema${sigue ? ' cont' : ''}">`;
+        abierta = b.s;
+      }
+      if (b.grupo !== grupo) {
+        if (grupo >= 0) html += '</div>';
+        if (b.grupo >= 0) html += `<div class="${b.clase}">`;
+        grupo = b.grupo;
+      }
+      html += b.html;
+    });
+    if (grupo >= 0) html += '</div>';
+    if (abierta >= 0) html += '</section>';
+    return html;
+  }
+
+  /** Construye las hojas y monta el pase de página. */
+  montar(hojaInicial) {
+    if (this.destroyed) return;
+    const len = this.content.length;
+    this.page = Math.max(0, Math.min(len + 1, hojaInicial ?? this.page));
+    this.pages = this.buildPages();
     if (window.St?.PageFlip) this.mountFlip();
     else this.mountFallback();
+  }
+
+  /** Si la pantalla pasa de una hoja a dos (o al revés), el renglón cambia: se vuelve a acomodar. */
+  async reacomodar() {
+    if (this.reacomodando || !this.opts.indice) return;
+    this.reacomodando = true;
+    const actual = this.content[this.toIndex(this.page) - 1];
+    const tema = actual?.tipo === 'hoja' ? this.fuente[actual.secciones[0]] : null;
+    try { this.flip?.destroy(); } catch { /* ya desmontado */ }
+    this.flip = null;
+    this.host = document.createElement('div');
+    this.host.className = 'flip-host';
+    this.frame.replaceChildren(this.host);
+    await this.preparar();
+    this.reacomodando = false;
+    this.montar(tema && this.hojaDe?.get(tema) ? this.hojaDe.get(tema) : this.page);
   }
 
   /** Contenedor de la barra superior donde se pueden añadir botones extra. */
@@ -237,7 +390,7 @@ export class BookViewer {
 
   mountFlip() {
     this.flip = new window.St.PageFlip(this.host, {
-      width: 500, height: 690,           // proporción de la hoja (1 : 1.38)
+      width: 500, height: Math.round(500 * PROPORCION), // hoja A4 (1 : √2)
       size: 'stretch',
       minWidth: 240, maxWidth: 900, minHeight: 330, maxHeight: 1250,
       showCover: true,                   // portada y contraportada sueltas, tapa dura
@@ -256,7 +409,10 @@ export class BookViewer {
     this.flip.loadFromHTML(this.pages);
     requestAnimationFrame(() => this.fitMath());
     this.flip.on('flip', (e) => this.sync(e.data));
-    this.flip.on('changeOrientation', () => this.sync(this.flip.getCurrentPageIndex()));
+    this.flip.on('changeOrientation', (e) => {
+      if (this.opts.indice && (e.data === 'portrait') !== this.modoPortrait) return this.reacomodar();
+      this.sync(this.flip.getCurrentPageIndex());
+    });
     this.flip.on('init', () => this.sync(this.flip.getCurrentPageIndex()));
     // Al empezar a pasar la hoja se bajan los post-its levantados (en 3D se verían encima de la hoja que gira).
     // Las fórmulas se ajustan cuando la hoja ya quedó quieta, nunca a mitad de la animación.
@@ -424,10 +580,14 @@ export class BookViewer {
       html += seccion('print-indice', pageInnerHtml({ tipo: 'indice', titulo: 'Índice', entradas: indices.flatMap((p) => p.entradas || []) }) +
         `<p class="print-aviso">Los números son las páginas del cuaderno: cada tema lleva su «p.» arriba a la derecha.</p>`);
     }
-    this.content.forEach((p, i) => {
-      if (p.tipo === 'indice' || (i === 0 && p.tipo === 'titulo')) return;
-      html += seccion('flujo', pageInnerHtml(p), i + 1);
-    });
+    if (this.hojaDe) {
+      this.fuente.forEach((t, i) => { if (!(i === 0 && t.tipo === 'titulo')) html += seccion('flujo', pageInnerHtml(t), this.hojaDe.get(t)); });
+    } else {
+      this.content.forEach((p, i) => {
+        if (p.tipo === 'indice' || (i === 0 && p.tipo === 'titulo')) return;
+        html += seccion('flujo', pageInnerHtml(p), i + 1);
+      });
+    }
     pb.innerHTML = html;
     this.el.appendChild(pb);
     try { toast('Preparando el PDF…'); } catch { /* sin toasts */ }

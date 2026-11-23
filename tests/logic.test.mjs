@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderMarkdown, renderInline } from '../js/markdown.js';
-import { pageInnerHtml, conIndice, POR_HOJA_INDICE } from '../js/book.js';
+import { pageInnerHtml, conIndice, acomodar, POR_HOJA_INDICE } from '../js/book.js';
 import { safeSrc, contrastText, escapeHtml } from '../js/util.js';
 import { validarFirma, firebaseListo } from '../js/store.js';
 
@@ -122,4 +122,19 @@ test('índice: hojas después de la portadilla con números que ya las cuentan',
   const html = pageInnerHtml(out[1]);
   assert.match(html, /data-act="goto" data-page="4"/);
   assert.equal(conIndice([{ tipo: 'texto', titulo: 'a', contenido: 'x' }]).indice, 0, 'sin índice si hay pocos temas');
+});
+
+test('acomodo: el contenido corre de hoja en hoja sin cortar bloques ni dejar títulos solos', () => {
+  const paginas = [{ tipo: 'titulo', titulo: 'Portada' }, { tipo: 'texto', titulo: 'A', contenido: 'x' }, { tipo: 'texto', titulo: 'B', contenido: 'x' }, { tipo: 'texto', titulo: 'C', contenido: 'x' }];
+  // bloques en el flujo: (tema, top, bottom, ¿título?)
+  const b = (s, top, bottom, encabezado = false) => ({ s, top, bottom, encabezado });
+  const bloques = [b(0, 0, 50), b(1, 60, 80, true), b(1, 80, 300), b(2, 320, 340, true), b(2, 340, 420), b(3, 440, 460, true), b(3, 460, 700)];
+  const r = acomodar(paginas, bloques, { cap: 400, porIndice: 20 });
+  assert.deepEqual(r.hojas, [[1, 2, 3, 4], [5, 6]], 'la portada va aparte; A y B juntas; C pasa entera a otra hoja');
+  assert.equal(r.indice.length, 1);
+  assert.equal(r.primeraIndice, 2);
+  assert.deepEqual(r.indice[0].entradas.map((e) => [e.titulo, e.pagina]), [['A', 3], ['B', 3], ['C', 4]]);
+  // Un título que cabe pero cuyo primer bloque no, baja con él
+  const r2 = acomodar(paginas, [b(0, 0, 50), b(1, 60, 380, false), b(2, 390, 410, true), b(2, 410, 600)], { cap: 400 });
+  assert.deepEqual(r2.hojas, [[1], [2, 3]]);
 });

@@ -4,7 +4,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderMarkdown, renderInline } from '../js/markdown.js';
-import { pageInnerHtml } from '../js/book.js';
+import { pageInnerHtml, conIndice, POR_HOJA_INDICE } from '../js/book.js';
 import { safeSrc, contrastText, escapeHtml } from '../js/util.js';
 import { validarFirma, firebaseListo } from '../js/store.js';
 
@@ -107,4 +107,19 @@ test('todos los archivos propios usan la misma versión (?v=) para saltarse la c
 test('las notas admiten listas', () => {
   const html = pageInnerHtml({ tipo: 'texto', contenido: 'x', nota: 'Propiedades:\n1. uno\n2. dos' });
   assert.match(html, /<aside class="nota"><p>Propiedades:<\/p><ol><li>uno<\/li><li>dos<\/li><\/ol><\/aside>/);
+});
+
+test('índice: hojas después de la portadilla con números que ya las cuentan', () => {
+  const paginas = [{ tipo: 'titulo', titulo: 'Portada' }, ...Array.from({ length: POR_HOJA_INDICE + 2 }, (_, i) => ({ tipo: 'texto', titulo: `Tema ${i + 1}`, contenido: 'x' }))];
+  const { paginas: out, indice } = conIndice(paginas);
+  assert.equal(indice, 2, 'la primera hoja de índice es la página 2');
+  assert.equal(out[1].tipo, 'indice');
+  assert.equal(out[2].tipo, 'indice', 'con más temas que caben, hay una segunda hoja');
+  assert.equal(out[3].titulo, 'Tema 1');
+  assert.equal(out[1].entradas[0].pagina, 4, 'Tema 1 queda en la página 4 (portada + 2 hojas de índice)');
+  const ult = out[2].entradas.at(-1);
+  assert.equal(out[ult.pagina - 1].titulo, ult.titulo, 'cada número apunta a su página');
+  const html = pageInnerHtml(out[1]);
+  assert.match(html, /data-act="goto" data-page="4"/);
+  assert.equal(conIndice([{ tipo: 'texto', titulo: 'a', contenido: 'x' }]).indice, 0, 'sin índice si hay pocos temas');
 });

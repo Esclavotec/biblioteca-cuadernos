@@ -13,8 +13,8 @@
  *   const v = new BookViewer(contenedor, libro, { startPage, onClose, onPageChange, onAction });
  *   v.next(); v.prev(); v.goToPage(3); v.destroy();
  */
-import { renderMarkdown, renderInline } from './markdown.js?v=1.3.3';
-import { escapeHtml as esc, contrastText, safeSrc } from './util.js?v=1.3.3';
+import { renderMarkdown, renderInline } from './markdown.js?v=1.3.4';
+import { escapeHtml as esc, contrastText, safeSrc, toast } from './util.js?v=1.3.4';
 
 const PAPELES = ['rayado', 'cuadriculado', 'blanco'];
 const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -31,6 +31,28 @@ function zoomable(src, alt, cls = '') {
 }
 
 /** HTML interior de una página según su "tipo". Todo texto pasa por esc()/markdown seguro. */
+/**
+ * Añade hojas de índice después de la portadilla (si la primera página es de tipo "titulo").
+ * Cada entrada es el título de una página con su número ya contando las hojas del índice.
+ * Devuelve { paginas, indice } donde indice es el número de la primera hoja de índice (0 si no hay).
+ */
+export const POR_HOJA_INDICE = 13;
+export function conIndice(paginas) {
+  const inicio = paginas[0]?.tipo === 'titulo' ? 1 : 0;
+  const temas = paginas.map((p, i) => ({ p, i })).filter(({ p, i }) => i >= inicio && p?.titulo);
+  if (temas.length < 3) return { paginas, indice: 0 };
+  const hojas = Math.ceil(temas.length / POR_HOJA_INDICE);
+  const indice = [];
+  for (let h = 0; h < hojas; h++) {
+    indice.push({
+      tipo: 'indice',
+      titulo: h ? 'Índice (cont.)' : 'Índice',
+      entradas: temas.slice(h * POR_HOJA_INDICE, (h + 1) * POR_HOJA_INDICE).map(({ p, i }) => ({ titulo: p.titulo, pagina: i + 1 + hojas })),
+    });
+  }
+  return { paginas: [...paginas.slice(0, inicio), ...indice, ...paginas.slice(inicio)], indice: inicio + 1 };
+}
+
 export function pageInnerHtml(p) {
   if (!p) return '';
   let html = '';
@@ -62,6 +84,12 @@ export function pageInnerHtml(p) {
         `</div>`;
       break;
     }
+    case 'indice': // hojas generadas por conIndice(): cada tema lleva a su página
+      html = `<h2>${esc(p.titulo)}</h2><ol class="indice">` + (p.entradas || []).map((e) =>
+        `<li><button type="button" data-act="goto" data-page="${e.pagina | 0}" aria-label="${esc(e.titulo)}, página ${e.pagina | 0}">` +
+        `<span class="t">${esc(e.titulo)}</span><span class="puntos" aria-hidden="true"></span><span class="n">${e.pagina | 0}</span></button></li>`).join('') +
+        `</ol>`;
+      break;
     case 'nueva':
       html = `<div class="pc-nueva"><p>Esta hoja espera tu firma</p>
         <button type="button" class="btn" data-act="firmar">Firmar en esta hoja</button></div>`;
@@ -104,6 +132,8 @@ export class BookViewer {
     this.book = book;
     this.opts = opts;
     this.content = Array.isArray(book.paginas) ? book.paginas : [];
+    this.indicePagina = 0;
+    if (opts.indice) ({ paginas: this.content, indice: this.indicePagina } = conIndice(this.content));
     this.papel = PAPELES.includes(book.papel) ? book.papel : 'blanco';
     this.destroyed = false;
     const len = this.content.length;
@@ -137,6 +167,11 @@ export class BookViewer {
     document.addEventListener('keydown', this.onKey);
     this.onResize = () => { clearTimeout(this.fitTimer); this.fitTimer = setTimeout(() => this.fitMath(), 150); };
     window.addEventListener('resize', this.onResize);
+    if (opts.indice) {
+      this.extra.innerHTML =
+        (this.indicePagina ? `<button type="button" class="btn" data-act="indice" aria-label="Ir al índice"><i class="ph ph-list-bullets" aria-hidden="true"></i><span class="lbl">Índice</span></button>` : '') +
+        `<button type="button" class="btn" data-act="pdf" aria-label="Descargar en PDF"><i class="ph ph-file-pdf" aria-hidden="true"></i><span class="lbl">PDF</span></button>`;
+    }
     root.appendChild(this.el);
 
     this.pages = this.buildPages();
@@ -268,13 +303,13 @@ export class BookViewer {
    *  - una fórmula dentro del texto que se partiría en dos renglones pasa entera a su propia línea, centrada;
    *  - una fórmula centrada más ancha que la hoja se achica lo justo (como mucho hasta el 60 %).
    */
-  fitMath() {
+  fitMath(root = this.el) {
     if (this.destroyed) return;
     const anchoReal = (box) => {
       const partes = [...box.querySelectorAll('.katex-html > .base, .math-raw')].map((e) => e.getBoundingClientRect());
       return partes.length ? Math.max(...partes.map((r) => r.right)) - Math.min(...partes.map((r) => r.left)) : 0;
     };
-    const enLinea = [...this.el.querySelectorAll('.page-content .katex')].filter((k) => !k.closest('.math-display, .postit-debajo, .postit'));
+    const enLinea = [...root.querySelectorAll('.page-content .katex')].filter((k) => !k.closest('.math-display, .postit-debajo, .postit'));
     enLinea.forEach((k) => { k.classList.remove('math-linea'); k.style.fontSize = ''; });
     for (const k of enLinea) {
       // En un solo renglón los trozos van de izquierda a derecha; si uno vuelve atrás, la fórmula se partió
@@ -292,7 +327,7 @@ export class BookViewer {
       // Se escala desde el tamaño actual (las notas ya usan fórmulas más chicas)
       if (caja > 0 && ancho > caja) k.style.fontSize = `${(parseFloat(getComputedStyle(k).fontSize) * Math.max(0.6, (caja / ancho) * 0.97)).toFixed(2)}px`;
     }
-    for (const m of this.el.querySelectorAll('.math-display')) {
+    for (const m of root.querySelectorAll('.math-display')) {
       if (!m.clientWidth) continue;                       // hoja oculta: se ajusta cuando se vea
       m.style.fontSize = '';
       // Ancho real: KaTeX deja que su contenido se salga de la caja sin cambiar scrollWidth
@@ -343,6 +378,9 @@ export class BookViewer {
     if (act === 'close') return this.close();
     if (act === 'prev') return this.prev();
     if (act === 'next') return this.next();
+    if (act === 'goto') return this.goToPage(Number(actEl.dataset.page) || 0);
+    if (act === 'indice') return this.goToPage(this.indicePagina);
+    if (act === 'pdf') return this.imprimir();
     if (act === 'zoom') return this.zoom(actEl.dataset.src, actEl.dataset.alt || actEl.querySelector('img')?.alt || '', actEl.classList.contains('postit-zoom'));
     if (act === 'lift') {
       const up = actEl.getAttribute('aria-pressed') !== 'true';
@@ -365,6 +403,32 @@ export class BookViewer {
     if (e.key === 'End') this.goToPage(this.content.length + 1);
   }
 
+  /**
+   * PDF: arma el cuaderno entero en hojas de papel (A4) y abre el diálogo de impresión,
+   * donde se elige «Guardar como PDF». Así fórmulas y dibujos quedan como vectores.
+   * En el PDF los post-its llevan debajo lo que se lee al levantarlos.
+   */
+  async imprimir() {
+    this.el.querySelector('.print-book')?.remove();
+    const b = this.book;
+    const pb = document.createElement('div');
+    pb.className = 'print-book';
+    pb.setAttribute('aria-hidden', 'true');
+    const cabeza = (n) => `<header class="print-head"><span>${esc(b.titulo)}</span><span>${n}</span></header>`;
+    const portada = this.content[0]?.tipo === 'titulo' ? '' :
+      `<section class="print-page"><div class="page-content">${pageInnerHtml({ tipo: 'titulo', titulo: b.titulo, subtitulo: [b.curso, b.subtitulo].filter(Boolean).join(' · ') })}</div></section>`;
+    pb.innerHTML = portada + this.content.map((p, i) =>
+      `<section class="print-page">${i ? cabeza(i + 1) : ''}<div class="page-content">${pageInnerHtml(p)}</div></section>`).join('');
+    this.el.appendChild(pb);
+    try { toast('Preparando el PDF…'); } catch { /* sin toasts */ }
+    // Espera fuentes y dibujos para que el PDF salga completo, y ajusta las fórmulas al ancho del papel
+    await Promise.all([document.fonts?.ready, ...[...pb.querySelectorAll('img')].map((im) => im.decode?.().catch(() => {}))]);
+    this.fitMath(pb);
+    if (this.tituloAntes === undefined) this.tituloAntes = document.title;
+    document.title = b.titulo;                          // nombre sugerido del archivo
+    window.print();
+  }
+
   /** Muestra una imagen a pantalla completa. */
   zoom(src, alt, dibujo = false) {
     const box = document.createElement('div');
@@ -385,6 +449,7 @@ export class BookViewer {
     this.destroyed = true;
     document.removeEventListener('keydown', this.onKey);
     window.removeEventListener('resize', this.onResize);
+    if (this.tituloAntes !== undefined) document.title = this.tituloAntes;
     clearTimeout(this.fitTimer);
     try { this.flip?.destroy(); } catch { /* ya desmontado */ }
     this.el.remove();

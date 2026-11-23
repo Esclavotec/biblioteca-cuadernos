@@ -18,9 +18,15 @@ No hace falta compilar nada: es HTML, CSS y JavaScript puro, así que funciona d
 | Ver una imagen en grande | Clic en la imagen | Toque |
 | Levantar un dibujo (post-it) y leer lo de debajo | Clic en el post-it (otra vez para bajarlo) · lupa para ampliar | Toque |
 | Volver a la mesa | `Esc` o **Biblioteca** | Botón ← |
+| Ir al índice | Botón **Índice** (arriba) · tocar un tema del índice lleva a su página | Igual |
+| Descargar en PDF | Botón **PDF** → en el diálogo de impresión, *Guardar como PDF* | Igual (Android: *Guardar como PDF*; iPhone: *Compartir* → *Guardar en Archivos*) |
 | Firmar el cuaderno de visitas | **Firmar** (arriba) o **Firmar en esta hoja** | Igual |
 
 Al acercar el mouse a una esquina, la hoja se levanta un poco para indicar que se puede arrastrar.
+
+**Índice.** Cada cuaderno tiene, después de la portadilla, hojas de índice generadas solas con el título de cada página (13 temas por hoja). No hay que escribirlo en el JSON: si se agregan páginas, el índice se actualiza.
+
+**PDF.** El botón PDF arma el cuaderno completo en hojas A4 (una por página del cuaderno, con los mismos números) y abre el diálogo de impresión. El texto, las fórmulas y los dibujos quedan como vectores, y cada post-it lleva debajo lo que se lee al levantarlo.
 
 Cada página tiene un número abajo. La URL también lo guarda (`#/libro/ejemplo-git/4`), así que para pedir una corrección basta con decir *"libro X, página N"*.
 
@@ -192,6 +198,11 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 ---
 
 ## Historial de cambios
+
+- **v1.3.4 (2026-11-23). Índice y PDF.**
+  - Hojas de índice automáticas después de la portadilla; cada tema lleva a su página. Botón **Índice** en la barra.
+  - Botón **PDF**: el cuaderno completo en A4, con fórmulas y dibujos vectoriales y el texto de debajo de cada post-it.
+  - Ojo: los números de página del cuaderno de CyA III se corrieron 3 (las hojas del índice).
 
 - **v1.3.3 (2026-11-20). Hojas blancas y notas con listas.**
   - Todos los cuadernos pasan a hoja blanca, que ahora es el papel por defecto.

@@ -6,9 +6,9 @@
  *   #/libro/<id>[/<pág>]   → abre books/<id>.json en esa página
  *   #/visitas[/<pág>]      → cuaderno de visitas
  */
-import { BookViewer } from './book.js?v=1.3.3';
-import { Guestbook } from './guestbook.js?v=1.3.3';
-import { escapeHtml as esc, contrastText, hashString, toast } from './util.js?v=1.3.3';
+import { BookViewer } from './book.js?v=1.3.4';
+import { Guestbook } from './guestbook.js?v=1.3.4';
+import { escapeHtml as esc, contrastText, hashString, toast } from './util.js?v=1.3.4';
 
 const $ = (sel) => document.querySelector(sel);
 const ID_RE = /^[a-z0-9][a-z0-9-]*$/;
@@ -120,6 +120,7 @@ async function abrirLibro(id, pagina) {
     document.body.classList.add('reading');
     abierto = new BookViewer($('#viewer-root'), libro, {
       startPage: pagina,
+      indice: true,                 // hojas de índice + botones Índice y PDF
       onClose: volver,
       onPageChange: (p) => history.replaceState(null, '', `#/libro/${id}${p ? `/${p}` : ''}`),
     });

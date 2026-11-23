@@ -489,7 +489,8 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
   .book-frame { width: min(calc(100vw - 32px), calc((100dvh - 172px) / 1.38)); }
   .viewer-bar { grid-template-columns: auto 1fr auto; padding: 12px 16px; }
   .viewer-bar > .btn .lbl, .viewer-extra .btn .lbl { display: none; }
-  .viewer-bar > .btn, .viewer-extra .btn { padding: 0 14px; }
+  .viewer-bar > .btn, .viewer-extra .btn { padding: 0 12px; }
+  .viewer-extra { gap: 6px; }
   .viewer-title { font-size: 16px; max-width: none; }
   .badge { display: none; }
   .indicator { min-width: 120px; }
@@ -497,4 +498,45 @@ div.tinta + div.tinta, div.tinta + p, p + div.tinta, .math-display + div.tinta {
 }
 @media (prefers-reduced-motion: reduce) {
   .notebook, .book-frame, .toast, .viewer, .modal, .postit { animation: none !important; transition: none !important; }
+}
+
+/* ---------- 8. Índice ---------- */
+.page-content ol.indice { list-style: none; padding-left: 0; margin: 0; }
+.indice button {
+  display: flex; align-items: baseline; gap: .45em; width: 100%; padding: 0; border: 0; background: none;
+  font: inherit; color: inherit; line-height: var(--lh); text-align: left; cursor: pointer;
+}
+.indice .t { flex: 0 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.indice .puntos { flex: 1 1 auto; min-width: 1.2em; border-bottom: 1.5px dotted rgba(28, 31, 29, .32); transform: translateY(-.28em); }
+.indice .n { flex: none; font-variant-numeric: tabular-nums; color: var(--paper-ink-2); }
+.indice button:hover .t, .indice button:focus-visible .t { color: var(--tinta-rojo); text-decoration: underline; text-underline-offset: .18em; }
+.indice button:focus-visible { outline: none; }
+
+/* ---------- 9. PDF (impresión) ----------
+   El cuaderno se arma en .print-book (fuera de pantalla para poder medir las fórmulas)
+   y al imprimir solo se ve eso: una hoja A4 por página del cuaderno. */
+.print-book {
+  position: fixed; left: -10000px; top: 0; width: 182mm; pointer-events: none;
+  background: #fff; color: var(--paper-ink); font-family: var(--font);
+}
+.print-page { --lh: 8.2mm; position: relative; font-size: calc(var(--lh) * .56); line-height: var(--lh); padding-bottom: 4mm; break-after: page; }
+.print-page:last-child { break-after: auto; }
+.print-page .page-content { position: static; inset: auto; padding: 0; overflow: visible; }
+.print-page .pc-titulo { min-height: 230mm; }
+.print-head { display: flex; justify-content: space-between; margin-bottom: 4mm; padding-bottom: 1.5mm; font-size: .68em; line-height: 1.2; color: var(--paper-ink-2); border-bottom: 1px solid rgba(28, 31, 29, .15); }
+.print-page .page-content h2 { white-space: normal; height: auto; }
+.print-page .postits, .print-page .postit-slot, .print-page .nota, .print-page .math-display { break-inside: avoid; }
+.print-page .postit-slot { display: flex; flex-direction: column; }
+.print-page .postit { transform: rotate(var(--giro)); cursor: default; }
+.print-page .postit-debajo { position: static; order: 2; display: block; padding: 2mm 1mm 0; text-align: left; box-shadow: none; font-size: .74em; color: var(--paper-ink-2); overflow: visible; }
+.print-page .postit-zoom { display: none; }
+.print-page .indice .puntos { transform: none; }
+
+@media print {
+  @page { size: A4; margin: 14mm 14mm 16mm; }
+  html, body { background: #fff !important; overflow: visible !important; height: auto !important; }
+  body::before, .viewer::before, .desk-view, #toasts, .viewer > :not(.print-book) { display: none !important; }
+  .viewer { position: static; display: block; background: #fff; animation: none; }
+  .print-book { position: static; left: auto; width: auto; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

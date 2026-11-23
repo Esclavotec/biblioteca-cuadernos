@@ -199,6 +199,8 @@ Para publicar, sube los archivos a un repositorio de GitHub y activa **Pages** (
 
 ## Historial de cambios
 
+- **v1.4.1 (2026-11-23). Empieza el II parcial.** Hay una portadilla "II parcial" y 36 páginas nuevas en CyA III: producto de límites, derivada direccional y derivadas parciales, gradiente, el teorema g(t) = f(a + tv), valor medio para campos escalares, derivadas de orden superior, ejercicios #18 y #19 del Apóstol, diferenciabilidad (definición, unicidad, T(y) = ∇f(a)·y) y ejemplos. Son 3 dibujos nuevos.
+
 - **v1.4.0 (2026-11-23). Hojas A4 con acomodo automático.**
   - Las hojas tienen proporción A4 (1 : √2) y en la computadora la letra es un poco más chica (unos 29 renglones por hoja).
   - El contenido corre de hoja en hoja como en un cuaderno de verdad: el visor mide cada bloque (párrafo, fórmula, dibujo, nota) y llena cada hoja antes de pasar a la siguiente. Un bloque nunca se corta, un título no se queda solo al pie y las portadillas van solas. En la computadora CyA III pasó de 107 a 76 hojas, y ninguna necesita scroll.

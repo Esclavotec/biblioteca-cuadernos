@@ -670,5 +670,46 @@ D['sen-1x'] = svg(320, 200, (() => {
     texto([214, O[1] - sy - 8], 'xₙ → sen = 1', { size: 12, c: ROJO }) + texto([214, O[1] + sy + 18], 'yₙ → sen = −1', { size: 12, c: VERDE });
 })(), 'sen(1/x) oscila cada vez más rápido cerca de 0: por xₙ vale 1 y por yₙ vale −1');
 
+/* ======================= II parcial: derivadas ======================= */
+
+D['derivada-direccional'] = svg(300, 220, (() => {
+  const a = [150, 120], v = [0.82, -0.57];
+  const P = (t) => [a[0] + v[0] * t, a[1] + v[1] * t];
+  return flecha([20, 190], [284, 190], { c: SUAVE, w: 1.2 }) + flecha([50, 210], [50, 14], { c: SUAVE, w: 1.2 }) +
+    linea([P(-150), P(150)], { c: ROJO, w: 1.8 }) + punta(P(130), P(150), { c: ROJO, w: 1.8 }) +
+    flecha(a, P(52), { c: AZUL, w: 2.4 }) + punto(a) + punto(P(95), { c: ROJO, r: 2.6 }) +
+    texto([a[0] - 14, a[1] + 18], 'a', { size: 15 }) + vec([P(40)[0] + 4, P(40)[1] + 22], 'v', { c: AZUL }) +
+    texto([P(95)[0] + 6, P(95)[1] + 14], 'a + tv', { size: 13, c: ROJO }) +
+    texto([150, 212], 'f restringida a la recta: una función de t', { size: 11, anchor: 'middle' });
+})(), 'Derivada direccional: cómo cambia f al moverse desde a en la dirección v');
+
+D['tvm'] = svg(300, 220, (() => {
+  const X = (x) => 50 + x * 220, Y = (y) => 190 - y * 160;
+  const f = (x) => 0.15 + 0.7 * x + 0.35 * Math.sin(2 * Math.PI * x * 0.9);
+  const pts = []; for (let i = 0; i <= 80; i++) { const x = i / 80; pts.push([X(x), Y(f(x))]); }
+  const m = (f(1) - f(0));
+  // θ donde f'(θ) = m (numérico)
+  let th = 0.1, best = 9;
+  for (let x = 0.01; x < 0.6; x += 0.001) { const d = (f(x + 1e-4) - f(x - 1e-4)) / 2e-4; if (Math.abs(d - m) < best) { best = Math.abs(d - m); th = x; } }
+  const tan = (x) => f(th) + m * (x - th);
+  return flecha([30, 190], [286, 190], { c: SUAVE, w: 1.2 }) + flecha([50, 206], [50, 14], { c: SUAVE, w: 1.2 }) +
+    linea(pts, { c: LAPIZ, w: 2 }) + linea([[X(0), Y(f(0))], [X(1), Y(f(1))]], { c: AZUL, w: 1.6 }) +
+    linea([[X(th - 0.25), Y(tan(th - 0.25))], [X(th + 0.3), Y(tan(th + 0.3))]], { c: ROJO, w: 1.8 }) +
+    punto([X(0), Y(f(0))]) + punto([X(1), Y(f(1))]) + punto([X(th), Y(f(th))], { c: ROJO }) +
+    linea([[X(th), Y(f(th))], [X(th), 190]], { dash: true, c: SUAVE }) +
+    texto([X(0) - 4, 206], 'a', { size: 13 }) + texto([X(th) - 4, 206], 'θ', { size: 13, c: ROJO }) + texto([X(1) - 4, 206], 'b', { size: 13 }) +
+    texto([X(0.62), Y(f(0.62)) - 34], 'secante', { size: 12, c: AZUL }) + texto([X(th) - 30, Y(tan(th + 0.3)) - 6], 'tangente ∥', { size: 12, c: ROJO });
+})(), 'Teorema del valor medio: en algún θ la tangente es paralela a la secante');
+
+D['camino-raiz'] = svg(280, 200, (() => {
+  const O = [40, 170], s = 200;
+  const pts = []; for (let i = 0; i <= 60; i++) { const x = i / 60; pts.push([O[0] + x * s, O[1] - Math.sqrt(x) * 140]); }
+  return flecha([20, O[1]], [266, O[1]], { c: SUAVE, w: 1.2 }) + flecha([O[0], 194], [O[0], 14], { c: SUAVE, w: 1.2 }) +
+    linea([[O[0], O[1]], [250, O[1]]], { c: AZUL, w: 2.2 }) + punta([90, O[1]], [60, O[1]], { c: AZUL, w: 2.2 }) +
+    linea(pts, { c: ROJO, w: 2.2 }) + punta(pts[10], pts[6], { c: ROJO, w: 2 }) +
+    `<circle cx="${O[0]}" cy="${O[1]}" r="4" fill="#fff" stroke="${LAPIZ}" stroke-width="1.5"/>` +
+    texto([140, O[1] + 18], 'ejes: f = 0', { size: 12, c: AZUL }) + texto([130, 96], 'y = √x: f → ½', { size: 13, c: ROJO });
+})(), 'Las derivadas parciales en el origen valen 0, pero por y = √x la función tiende a 1/2: no es continua');
+
 for (const [nombre, contenido] of Object.entries(D)) writeFileSync(path.join(OUT, `${nombre}.svg`), contenido);
 console.log(`${Object.keys(D).length} dibujos en ${path.relative(root, OUT)}`);
